@@ -64,6 +64,13 @@ pub fn launch_game(
     // Add instance's custom JVM args
     jvm_args.extend(instance.jvm_args.clone());
 
+    // Add logging argument if present (modern versions 1.19+)
+    if let Some(log_arg_raw) = version_json["logging"]["client"]["argument"].as_str() {
+        let log_path = instance_dir.join("log_configs");
+        let log_arg = log_arg_raw.replace("${path}", &log_path.to_string_lossy());
+        jvm_args.push(log_arg);
+    }
+
     // Replace placeholders
     let classpath_separator = if cfg!(target_os = "windows") { ";" } else { ":" };
     let natives_dir = paths::shared_dir()
