@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Box } from "@mui/material";
 import Sidebar from "../components/Sidebar";
+import DownloadOverlay from "../components/download/DownloadOverlay";
 
 const DRAWER_WIDTH = 240;
 
@@ -19,6 +20,7 @@ export default function SidebarLayout() {
       >
         <Outlet />
       </Box>
+      <DownloadOverlay />
     </Box>
   );
 }

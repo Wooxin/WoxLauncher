@@ -77,6 +77,23 @@
     "loginSuccess": "Logged in as {{name}}",
     "loginFailed": "Login failed"
   },
+  "download": {
+    "downloading": "Downloading",
+    "verifying": "Verifying",
+    "done": "Done",
+    "error": "Error",
+    "speed": "{{speed}}",
+    "active": "Downloads ({{count}} active)"
+  },
+  "launch": {
+    "preparing": "Preparing game assets...",
+    "starting": "Starting Minecraft...",
+    "launched": "Game launched!",
+    "errorAuth": "Not logged in. Please add an account first.",
+    "errorNoJava": "No Java runtime found. Please install Java.",
+    "errorNetwork": "Network error. Check your connection.",
+    "assetsDownloaded": "Assets downloaded successfully"
+  },
   "common": {
     "vanilla": "Vanilla",
     "fabric": "Fabric",

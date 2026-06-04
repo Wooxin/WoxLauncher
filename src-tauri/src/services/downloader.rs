@@ -2,6 +2,7 @@ use crate::error::WoxError;
 use crate::models::download::{DownloadProgress, DownloadStatus};
 use crate::utils::requests;
 use std::path::PathBuf;
+use tauri::Emitter;
 use tokio::io::AsyncWriteExt;
 
 pub async fn download_file(
@@ -118,4 +119,20 @@ pub async fn download_file(
     });
 
     Ok(())
+}
+
+pub async fn download_file_with_events(
+    app_handle: &tauri::AppHandle,
+    url: &str,
+    dest: std::path::PathBuf,
+    sha1: Option<&str>,
+    file_label: String,
+) -> Result<(), WoxError> {
+    let label = file_label;
+    let handle = app_handle.clone();
+    download_file(url, dest, sha1, move |progress| {
+        let mut p = progress;
+        p.file_name = label.clone();
+        let _ = handle.emit(crate::events::EVENT_DOWNLOAD_PROGRESS, &p);
+    }).await
 }
