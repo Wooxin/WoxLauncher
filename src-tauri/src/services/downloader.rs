@@ -128,9 +128,27 @@ pub async fn download_file_with_events(
 ) -> Result<(), WoxError> {
     let label = file_label;
     let handle = app_handle.clone();
-    download_file(url, dest, sha1, move |progress| {
-        let mut p = progress;
-        p.file_name = label.clone();
-        let _ = handle.emit(crate::events::EVENT_DOWNLOAD_PROGRESS, &p);
-    }).await
+    let max_retries = 3u32;
+
+    for attempt in 1..=max_retries {
+        // Delete any partial/corrupted file before retry
+        if attempt > 1 {
+            let _ = tokio::fs::remove_file(&dest).await;
+        }
+
+        match download_file(url, dest.clone(), sha1, move |progress| {
+            let mut p = progress;
+            p.file_name = label.clone();
+            let _ = handle.emit(crate::events::EVENT_DOWNLOAD_PROGRESS, &p);
+        }).await {
+            Ok(()) => return Ok(()),
+            Err(WoxError::Validation(e)) if e.starts_with("SHA1") && attempt < max_retries => {
+                eprintln!("Retry {}/{} for {}: {}", attempt, max_retries, label, e);
+                continue;
+            },
+            Err(e) => return Err(e),
+        }
+    }
+
+    Err(WoxError::Validation(format!("Failed after {} retries: {}", max_retries, label)))
 }
