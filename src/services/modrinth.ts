@@ -44,3 +44,21 @@ export async function getModrinthMod(projectId: string): Promise<ModResult> {
     author: data.team || "",
   };
 }
+
+export async function getModrinthDownloadUrl(projectId: string, version?: string): Promise<{ url: string; filename: string } | null> {
+  const params = version ? `?game_versions=["${encodeURIComponent(version)}"]` : "";
+  const url = `${BASE}/project/${projectId}/version${params}`;
+  const resp = await fetch(url, {
+    headers: { "User-Agent": "WoxLauncher/0.1.0" },
+  });
+  if (!resp.ok) throw new Error(`Modrinth API error: ${resp.status}`);
+  const versions = await resp.json();
+  if (!versions?.length) return null;
+
+  // Pick primarly file (first one) from latest version
+  const latest = versions[0];
+  const file = latest.files?.find((f: any) => f.primary) || latest.files?.[0];
+  if (!file) return null;
+
+  return { url: file.url, filename: file.filename };
+}

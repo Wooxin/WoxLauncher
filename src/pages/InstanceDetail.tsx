@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 import { ALL_LOADERS } from "../constants";
 import { useJavaStore } from "../stores/javaStore";
 import { useModSearch } from "../hooks/useModSearch";
-import { getModrinthMod } from "../services/modrinth";
+import { getModrinthDownloadUrl } from "../services/modrinth";
 import type { InstanceConfig, LoaderType, ModSource } from "../types";
 
 interface TabPanelProps {
@@ -260,11 +260,16 @@ export default function InstanceDetail() {
                   <IconButton size="small" color="primary"
                     onClick={async (e) => {
                       e.stopPropagation();
+                      if (!instance) return;
                       try {
-                        const modDetail = await getModrinthMod(mod.id);
-                        const ver = (modDetail as any).versions?.[0] || "";
-                        setSnackbar({ open: true, message: `${mod.name} ${ver}`, severity: "info" });
-                      } catch {}
+                        const dl = await getModrinthDownloadUrl(mod.id, modVersion || undefined);
+                        if (!dl) { setSnackbar({ open: true, message: `${mod.name}: no download URL`, severity: "error" }); return; }
+                        const dest = `./wox_data/instances/${instance.id}/mods/${dl.filename}`;
+                        await invoke("start_download", { url: dl.url, dest, sha1: null, label: mod.name });
+                        setSnackbar({ open: true, message: `${mod.name} downloaded`, severity: "success" });
+                      } catch (err) {
+                        setSnackbar({ open: true, message: String(err), severity: "error" });
+                      }
                     }}
                   >
                     <DownloadIcon fontSize="small" />
