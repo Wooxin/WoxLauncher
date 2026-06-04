@@ -200,8 +200,8 @@ export default function InstanceDetail() {
             sx={{ minWidth: 120 }}
           >
             <MenuItem value="modrinth">Modrinth</MenuItem>
-            <MenuItem value="curseforge" disabled>CurseForge ({t("mod.comingSoon")})</MenuItem>
-            <MenuItem value="mcmod" disabled>MCMod ({t("mod.comingSoon")})</MenuItem>
+            <MenuItem value="curseforge">CurseForge</MenuItem>
+            <MenuItem value="mcmod">MCMod</MenuItem>
           </TextField>
           <TextField
             size="small"

@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { searchModrinth } from "../services/modrinth";
+import { searchCurseForge } from "../services/curseforge";
+import { searchMcmod } from "../services/mcmod";
 import type { ModSource } from "../types";
 
 export function useModSearch(query: string, source: ModSource, version?: string) {
@@ -10,6 +12,10 @@ export function useModSearch(query: string, source: ModSource, version?: string)
       switch (source) {
         case "modrinth":
           return searchModrinth(query, version);
+        case "curseforge":
+          return searchCurseForge(query, version);
+        case "mcmod":
+          return searchMcmod(query, version);
         default:
           return [];
       }
