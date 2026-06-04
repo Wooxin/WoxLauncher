@@ -20,7 +20,7 @@ export const useJavaStore = create<JavaState>((set) => ({
       const runtimes = await invoke<JavaRuntime[]>("detect_java", { customPath: customPath || null });
       set({ runtimes, loading: false });
     } catch (e) {
-      set({ error: String(e), loading: false });
+      set({ error: (typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)), loading: false });
     }
   },
 }));

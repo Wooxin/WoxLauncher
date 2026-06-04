@@ -57,7 +57,7 @@ export default function Home() {
       setSnackbar({ open: true, message: t("launch.launched"), severity: "success" });
     } catch (e) {
       setLaunchStatus('idle');
-      setSnackbar({ open: true, message: String(e), severity: "error" });
+      setSnackbar({ open: true, message: (typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)), severity: "error" });
     }
   };
 

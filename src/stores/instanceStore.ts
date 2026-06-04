@@ -24,7 +24,7 @@ export const useInstanceStore = create<InstanceState>((set, get) => ({
       const instances = await invoke<InstanceConfig[]>("list_instances");
       set({ instances, loading: false });
     } catch (e) {
-      set({ error: String(e), loading: false });
+      set({ error: (typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)), loading: false });
     }
   },
 
@@ -36,7 +36,7 @@ export const useInstanceStore = create<InstanceState>((set, get) => ({
       set({ instances: [...get().instances, created] });
       return created;
     } catch (e) {
-      set({ error: String(e) });
+      set({ error: (typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)) });
       throw e;
     }
   },
@@ -46,7 +46,7 @@ export const useInstanceStore = create<InstanceState>((set, get) => ({
       await invoke("delete_instance", { id });
       set({ instances: get().instances.filter((i) => i.id !== id) });
     } catch (e) {
-      set({ error: String(e) });
+      set({ error: (typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)) });
     }
   },
 }));

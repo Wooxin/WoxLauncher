@@ -2,6 +2,20 @@ import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import type { StoredAccount } from "../types";
 
+function extractError(e: unknown): string {
+  if (typeof e === "string") return e;
+  if (e && typeof e === "object") {
+    const err = e as any;
+    // Tauri serializes WoxError as { type, message }
+    if (err.message) return err.message;
+    // Standard Error
+    if (err.toString !== Object.prototype.toString) return err.toString();
+    // Fallback: try to stringify
+    try { return JSON.stringify(err); } catch { return extractError(e); }
+  }
+  return extractError(e);
+}
+
 interface AccountState {
   accounts: StoredAccount[];
   activeAccount: StoredAccount | null;
@@ -29,7 +43,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
       const active = await invoke<StoredAccount | null>("get_active_account");
       set({ accounts, activeAccount: active, loading: false });
     } catch (e) {
-      set({ error: String(e), loading: false });
+      set({ error: extractError(e), loading: false });
     }
   },
 
@@ -39,7 +53,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
       await invoke("offline_auth", { username });
       await get().fetchAccounts();
     } catch (e) {
-      set({ error: String(e), loading: false });
+      set({ error: extractError(e), loading: false });
     }
   },
 
@@ -60,7 +74,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
       await invoke("ms_poll_token", { deviceCode });
       await get().fetchAccounts();
     } catch (e) {
-      set({ error: String(e), loading: false });
+      set({ error: extractError(e), loading: false });
     }
   },
 
@@ -70,7 +84,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
       await invoke("authlib_login", { serverUrl, username, password });
       await get().fetchAccounts();
     } catch (e) {
-      set({ error: String(e), loading: false });
+      set({ error: extractError(e), loading: false });
     }
   },
 
@@ -79,7 +93,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
       const account = await invoke<StoredAccount | null>("set_active_account", { uuid });
       set({ activeAccount: account });
     } catch (e) {
-      set({ error: String(e) });
+      set({ error: extractError(e) });
     }
   },
 
@@ -88,7 +102,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
       await invoke("delete_account", { uuid });
       await get().fetchAccounts();
     } catch (e) {
-      set({ error: String(e) });
+      set({ error: extractError(e) });
     }
   },
 }));

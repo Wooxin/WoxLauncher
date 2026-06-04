@@ -116,7 +116,7 @@ export default function LoginDialog({ open, onClose }: Props) {
       }, interval * 1000);
       pollingRef.current = pollInterval;
     } catch (e) {
-      setLocalError(String(e));
+      setLocalError(typeof e === "string" ? e : (e && typeof e === "object" ? ((e as any).message || String(e)) : String(e)));
       setLoginLoading(false);
     }
   };
@@ -139,7 +139,7 @@ export default function LoginDialog({ open, onClose }: Props) {
       await loginOffline(username);
       onClose();
     } catch (e) {
-      setLocalError(String(e));
+      setLocalError(typeof e === "string" ? e : (e && typeof e === "object" ? ((e as any).message || String(e)) : String(e)));
     }
   };
 
@@ -150,7 +150,7 @@ export default function LoginDialog({ open, onClose }: Props) {
       await loginAuthlib(serverUrl, username, password);
       onClose();
     } catch (e) {
-      setLocalError(String(e));
+      setLocalError(typeof e === "string" ? e : (e && typeof e === "object" ? ((e as any).message || String(e)) : String(e)));
     }
   };
 
