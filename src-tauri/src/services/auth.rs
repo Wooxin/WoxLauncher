@@ -94,8 +94,9 @@ pub async fn ms_device_code(client: &Client) -> Result<DeviceCodeData, String> {
         .map_err(|e| format!("Network error: {}", e))?;
 
     if !resp.status().is_success() {
+        let status = resp.status();
         let body = resp.text().await.unwrap_or_default();
-        return Err(format!("Microsoft login failed ({}): {}", resp.status(), body));
+        return Err(format!("Microsoft login failed ({}): {}", status, body));
     }
 
     let resp: DeviceCodeResponse = resp
