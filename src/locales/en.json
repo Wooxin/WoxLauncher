@@ -31,7 +31,11 @@
     "jvmArgs": "JVM Args",
     "created": "Created",
     "notFound": "Instance not found",
-    "launchPlaceholder": "Launching {{name}}... (Auth & Java selection coming in next iteration)"
+    "launchPlaceholder": "Launching {{name}}... (Auth & Java selection coming in next iteration)",
+    "release": "Release",
+    "snapshot": "Snapshot",
+    "selected": "Selected",
+    "selectVersionFirst": "Select a version first"
   },
   "mod": {
     "title": "Mod Browser",
