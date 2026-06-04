@@ -65,10 +65,27 @@ pub fn launch_game(
     jvm_args.extend(instance.jvm_args.clone());
 
     // Add logging argument if present (modern versions 1.19+)
+    let log_configs_dir = instance_dir.join("log_configs");
     if let Some(log_arg_raw) = version_json["logging"]["client"]["argument"].as_str() {
-        let log_path = instance_dir.join("log_configs");
-        let log_arg = log_arg_raw.replace("${path}", &log_path.to_string_lossy());
+        std::fs::create_dir_all(&log_configs_dir).ok();
+        let log_arg = log_arg_raw.replace("${path}", &log_configs_dir.to_string_lossy());
         jvm_args.push(log_arg);
+    }
+    // Download logging config file if present
+    if let Some(log_file) = version_json["logging"]["client"]["file"].as_object() {
+        let log_id = log_file["id"].as_str().unwrap_or("log4j2.xml");
+        let log_path = log_configs_dir.join(log_id);
+        if !log_path.exists() {
+            if let Some(url) = log_file["url"].as_str() {
+                std::fs::create_dir_all(&log_configs_dir).ok();
+                // Download via blocking HTTP
+                if let Ok(resp) = reqwest::blocking::get(url) {
+                    if let Ok(bytes) = resp.bytes() {
+                        let _ = std::fs::write(&log_path, &bytes);
+                    }
+                }
+            }
+        }
     }
 
     // Replace placeholders
