@@ -9,6 +9,7 @@
     "instances": "Instances",
     "modBrowser": "Mod Browser",
     "java": "Java",
+    "accounts": "Accounts",
     "settings": "Settings"
   },
   "instance": {
@@ -93,6 +94,7 @@
     "username": "Username",
     "password": "Password",
     "serverUrl": "Auth Server URL",
+    "active": "Active",
     "loginSuccess": "Logged in as {{name}}",
     "loginFailed": "Login failed",
     "copyCode": "Copy code",

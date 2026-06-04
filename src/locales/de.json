@@ -9,6 +9,7 @@
     "instances": "Instanzen",
     "modBrowser": "Mod-Browser",
     "java": "Java",
+    "accounts": "Konten",
     "settings": "Einstellungen"
   },
   "instance": {
@@ -43,7 +44,13 @@
   "java": {
     "title": "Java-Runtimes",
     "refresh": "Aktualisieren",
-    "noRuntimes": "Keine Java-Runtimes erkannt. Installiere eine, um zu beginnen."
+    "noRuntimes": "Keine Java-Runtimes erkannt. Installiere eine, um zu beginnen.",
+    "downloadTitle": "Java herunterladen",
+    "downloadBtn": "Herunterladen",
+    "vendorLabel": "Anbieter",
+    "versionLabel": "Version",
+    "installing": "Installiere {{vendor}} {{version}}...",
+    "installed": "{{vendor}} {{version}} erfolgreich installiert"
   },
   "settings": {
     "title": "Einstellungen",
@@ -56,7 +63,22 @@
     "version": "WoxLauncher",
     "versionValue": "Version 0.1.0",
     "builtWith": "Erstellt mit",
-    "builtWithValue": "Tauri 2 + React 19 + MUI"
+    "builtWithValue": "Tauri 2 + React 19 + MUI",
+    "appearance": "Erscheinungsbild",
+    "theme": "Design",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "download": "Download",
+    "mirror": "Download-Mirror",
+    "mirrorOfficial": "Offiziell (Mojang)",
+    "mirrorBmclapi": "BMCLAPI (China)",
+    "mirrorMcbbs": "MCBBS (China)",
+    "maxThreads": "Max. Download-Threads",
+    "launch": "Start-Standards",
+    "defaultJvmArgs": "Standard JVM-Argumente",
+    "maxMemory": "Max. Speicher",
+    "autoMemory": "Auto Speicher",
+    "autoMemoryDesc": "RAM automatisch erkennen und Speicher optimieren"
   },
   "account": {
     "title": "Konto",
@@ -74,8 +96,16 @@
     "username": "Benutzername",
     "password": "Passwort",
     "serverUrl": "Auth-Server-URL",
+    "active": "Aktiv",
     "loginSuccess": "Angemeldet als {{name}}",
-    "loginFailed": "Anmeldung fehlgeschlagen"
+    "loginFailed": "Anmeldung fehlgeschlagen",
+    "copyCode": "Code kopieren",
+    "codeCopied": "Kopiert！",
+    "openBrowserAgain": "Browser erneut öffnen",
+    "expiresIn": "Läuft in {{time}} ab",
+    "codeExpired": "Code abgelaufen. Erneut versuchen",
+    "retry": "Wiederholen",
+    "cancel": "Abbrechen"
   },
   "download": {
     "downloading": "Download",
@@ -83,7 +113,8 @@
     "done": "Fertig",
     "error": "Fehler",
     "speed": "{{speed}}",
-    "active": "Downloads ({{count}} aktiv)"
+    "active": "Downloads ({{count}} aktiv)",
+    "installingVersion": "Minecraft {{version}} wird heruntergeladen..."
   },
   "launch": {
     "preparing": "Spielressourcen werden vorbereitet...",

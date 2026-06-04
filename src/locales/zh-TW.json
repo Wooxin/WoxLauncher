@@ -9,6 +9,7 @@
     "instances": "實例",
     "modBrowser": "Mod 瀏覽",
     "java": "Java",
+    "accounts": "帳戶",
     "settings": "設定"
   },
   "instance": {
@@ -43,7 +44,13 @@
   "java": {
     "title": "Java 執行環境",
     "refresh": "重新整理",
-    "noRuntimes": "未偵測到 Java 執行環境，請安裝一個以開始使用。"
+    "noRuntimes": "未偵測到 Java 執行環境，請安裝一個以開始使用。",
+    "downloadTitle": "下載 Java",
+    "downloadBtn": "下載",
+    "vendorLabel": "供應商",
+    "versionLabel": "版本",
+    "installing": "正在安裝 {{vendor}} {{version}}...",
+    "installed": "{{vendor}} {{version}} 安裝成功"
   },
   "settings": {
     "title": "設定",
@@ -56,7 +63,22 @@
     "version": "WoxLauncher",
     "versionValue": "版本 0.1.0",
     "builtWith": "技術棧",
-    "builtWithValue": "Tauri 2 + React 19 + MUI"
+    "builtWithValue": "Tauri 2 + React 19 + MUI",
+    "appearance": "外觀",
+    "theme": "主題",
+    "light": "淺色",
+    "dark": "深色",
+    "download": "下載",
+    "mirror": "下載鏡像",
+    "mirrorOfficial": "官方 (Mojang)",
+    "mirrorBmclapi": "BMCLAPI (中國)",
+    "mirrorMcbbs": "MCBBS (中國)",
+    "maxThreads": "最大下載線程",
+    "launch": "啟動預設值",
+    "defaultJvmArgs": "預設 JVM 參數",
+    "maxMemory": "最大記憶體",
+    "autoMemory": "自動記憶體",
+    "autoMemoryDesc": "自動偵測系統記憶體並配置最佳分配"
   },
   "account": {
     "title": "帳戶",
@@ -74,8 +96,16 @@
     "username": "使用者名稱",
     "password": "密碼",
     "serverUrl": "認證伺服器 URL",
+    "active": "當前",
     "loginSuccess": "已登入為 {{name}}",
-    "loginFailed": "登入失敗"
+    "loginFailed": "登入失敗",
+    "copyCode": "複製代碼",
+    "codeCopied": "已複製！",
+    "openBrowserAgain": "重新開啟瀏覽器",
+    "expiresIn": "{{time}}後過期",
+    "codeExpired": "代碼已過期，請重試",
+    "retry": "重試",
+    "cancel": "取消"
   },
   "download": {
     "downloading": "下載中",
@@ -83,7 +113,8 @@
     "done": "完成",
     "error": "錯誤",
     "speed": "{{speed}}",
-    "active": "下載中（{{count}} 活躍）"
+    "active": "下載中（{{count}} 活躍）",
+    "installingVersion": "正在下載 Minecraft {{version}}..."
   },
   "launch": {
     "preparing": "正在準備遊戲資源...",

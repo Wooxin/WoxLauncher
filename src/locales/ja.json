@@ -9,6 +9,7 @@
     "instances": "インスタンス",
     "modBrowser": "Mod ブラウザ",
     "java": "Java",
+    "accounts": "アカウント",
     "settings": "設定"
   },
   "instance": {
@@ -43,7 +44,13 @@
   "java": {
     "title": "Java ランタイム",
     "refresh": "更新",
-    "noRuntimes": "Java ランタイムが検出されませんでした。インストールして始めましょう。"
+    "noRuntimes": "Java ランタイムが検出されませんでした。インストールして始めましょう。",
+    "downloadTitle": "Java をダウンロード",
+    "downloadBtn": "ダウンロード",
+    "vendorLabel": "ベンダー",
+    "versionLabel": "バージョン",
+    "installing": "{{vendor}} {{version}} をインストール中...",
+    "installed": "{{vendor}} {{version}} が正常にインストールされました"
   },
   "settings": {
     "title": "設定",
@@ -56,7 +63,22 @@
     "version": "WoxLauncher",
     "versionValue": "バージョン 0.1.0",
     "builtWith": "技術スタック",
-    "builtWithValue": "Tauri 2 + React 19 + MUI"
+    "builtWithValue": "Tauri 2 + React 19 + MUI",
+    "appearance": "外観",
+    "theme": "テーマ",
+    "light": "ライト",
+    "dark": "ダーク",
+    "download": "ダウンロード",
+    "mirror": "ダウンロードミラー",
+    "mirrorOfficial": "公式 (Mojang)",
+    "mirrorBmclapi": "BMCLAPI (中国)",
+    "mirrorMcbbs": "MCBBS (中国)",
+    "maxThreads": "最大ダウンロードスレッド",
+    "launch": "起動デフォルト",
+    "defaultJvmArgs": "デフォルト JVM 引数",
+    "maxMemory": "最大メモリ",
+    "autoMemory": "自動メモリ",
+    "autoMemoryDesc": "システムRAMを自動検出して最適なメモリを設定"
   },
   "account": {
     "title": "アカウント",
@@ -74,8 +96,16 @@
     "username": "ユーザー名",
     "password": "パスワード",
     "serverUrl": "認証サーバー URL",
+    "active": "有効",
     "loginSuccess": "{{name}} としてログインしました",
-    "loginFailed": "ログインに失敗しました"
+    "loginFailed": "ログインに失敗しました",
+    "copyCode": "コードをコピー",
+    "codeCopied": "コピーしました！",
+    "openBrowserAgain": "ブラウザを再表示",
+    "expiresIn": "{{time}}で期限切れ",
+    "codeExpired": "コードの有効期限が切れました。再試行してください",
+    "retry": "再試行",
+    "cancel": "キャンセル"
   },
   "download": {
     "downloading": "ダウンロード中",
@@ -83,7 +113,8 @@
     "done": "完了",
     "error": "エラー",
     "speed": "{{speed}}",
-    "active": "ダウンロード中（{{count}} アクティブ）"
+    "active": "ダウンロード中（{{count}} アクティブ）",
+    "installingVersion": "Minecraft {{version}} をダウンロード中..."
   },
   "launch": {
     "preparing": "ゲームアセットを準備中...",

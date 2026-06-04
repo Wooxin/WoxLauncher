@@ -9,6 +9,7 @@
     "instances": "Instancias",
     "modBrowser": "Explorar Mods",
     "java": "Java",
+    "accounts": "Cuentas",
     "settings": "Ajustes"
   },
   "instance": {
@@ -43,7 +44,13 @@
   "java": {
     "title": "Runtimes de Java",
     "refresh": "Actualizar",
-    "noRuntimes": "No se detectaron runtimes de Java. Instala uno para comenzar."
+    "noRuntimes": "No se detectaron runtimes de Java. Instala uno para comenzar.",
+    "downloadTitle": "Descargar Java",
+    "downloadBtn": "Descargar",
+    "vendorLabel": "Proveedor",
+    "versionLabel": "Versión",
+    "installing": "Instalando {{vendor}} {{version}}...",
+    "installed": "{{vendor}} {{version}} instalado correctamente"
   },
   "settings": {
     "title": "Ajustes",
@@ -56,7 +63,22 @@
     "version": "WoxLauncher",
     "versionValue": "Versión 0.1.0",
     "builtWith": "Creado con",
-    "builtWithValue": "Tauri 2 + React 19 + MUI"
+    "builtWithValue": "Tauri 2 + React 19 + MUI",
+    "appearance": "Apariencia",
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "download": "Descarga",
+    "mirror": "Espejo de descarga",
+    "mirrorOfficial": "Oficial (Mojang)",
+    "mirrorBmclapi": "BMCLAPI (China)",
+    "mirrorMcbbs": "MCBBS (China)",
+    "maxThreads": "Máx. hilos de descarga",
+    "launch": "Valores de inicio",
+    "defaultJvmArgs": "Argumentos JVM por defecto",
+    "maxMemory": "Memoria máxima",
+    "autoMemory": "Memoria auto",
+    "autoMemoryDesc": "Detectar RAM automáticamente y configurar memoria óptima"
   },
   "account": {
     "title": "Cuenta",
@@ -74,8 +96,16 @@
     "username": "Nombre de usuario",
     "password": "Contraseña",
     "serverUrl": "URL del servidor de autenticación",
+    "active": "Activo",
     "loginSuccess": "Conectado como {{name}}",
-    "loginFailed": "Error de inicio de sesión"
+    "loginFailed": "Error de inicio de sesión",
+    "copyCode": "Copiar código",
+    "codeCopied": "¡Copiado！",
+    "openBrowserAgain": "Abrir navegador otra vez",
+    "expiresIn": "Expira en {{time}}",
+    "codeExpired": "Código expirado. Inténtelo de nuevo",
+    "retry": "Reintentar",
+    "cancel": "Cancelar"
   },
   "download": {
     "downloading": "Descargando",
@@ -83,7 +113,8 @@
     "done": "Hecho",
     "error": "Error",
     "speed": "{{speed}}",
-    "active": "Descargas ({{count}} activas)"
+    "active": "Descargas ({{count}} activas)",
+    "installingVersion": "Descargando Minecraft {{version}}..."
   },
   "launch": {
     "preparing": "Preparando recursos del juego...",

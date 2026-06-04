@@ -9,6 +9,7 @@
     "instances": "实例",
     "modBrowser": "Mod 浏览",
     "java": "Java",
+    "accounts": "账户",
     "settings": "设置"
   },
   "instance": {
@@ -43,7 +44,13 @@
   "java": {
     "title": "Java 运行时",
     "refresh": "刷新",
-    "noRuntimes": "未检测到 Java 运行时，请安装一个以开始使用。"
+    "noRuntimes": "未检测到 Java 运行时，请安装一个以开始使用。",
+    "downloadTitle": "下载 Java",
+    "downloadBtn": "下载",
+    "vendorLabel": "供应商",
+    "versionLabel": "版本",
+    "installing": "正在安装 {{vendor}} {{version}}...",
+    "installed": "{{vendor}} {{version}} 安装成功"
   },
   "settings": {
     "title": "设置",
@@ -56,7 +63,22 @@
     "version": "WoxLauncher",
     "versionValue": "版本 0.1.0",
     "builtWith": "技术栈",
-    "builtWithValue": "Tauri 2 + React 19 + MUI"
+    "builtWithValue": "Tauri 2 + React 19 + MUI",
+    "appearance": "外观",
+    "theme": "主题",
+    "light": "浅色",
+    "dark": "深色",
+    "download": "下载",
+    "mirror": "下载镜像",
+    "mirrorOfficial": "官方 (Mojang)",
+    "mirrorBmclapi": "BMCLAPI (中国)",
+    "mirrorMcbbs": "MCBBS (中国)",
+    "maxThreads": "最大下载线程",
+    "launch": "启动默认值",
+    "defaultJvmArgs": "默认 JVM 参数",
+    "maxMemory": "最大内存",
+    "autoMemory": "自动内存",
+    "autoMemoryDesc": "自动检测系统内存并配置最优分配"
   },
   "account": {
     "title": "账户",
@@ -74,8 +96,16 @@
     "username": "用户名",
     "password": "密码",
     "serverUrl": "认证服务器 URL",
+    "active": "当前",
     "loginSuccess": "已登录为 {{name}}",
-    "loginFailed": "登录失败"
+    "loginFailed": "登录失败",
+    "copyCode": "复制代码",
+    "codeCopied": "已复制！",
+    "openBrowserAgain": "重新打开浏览器",
+    "expiresIn": "{{time}}后过期",
+    "codeExpired": "代码已过期，请重试",
+    "retry": "重试",
+    "cancel": "取消"
   },
   "download": {
     "downloading": "下载中",
@@ -83,7 +113,8 @@
     "done": "完成",
     "error": "错误",
     "speed": "{{speed}}",
-    "active": "下载中（{{count}} 活跃）"
+    "active": "下载中（{{count}} 活跃）",
+    "installingVersion": "正在下载 Minecraft {{version}}..."
   },
   "launch": {
     "preparing": "正在准备游戏资源...",

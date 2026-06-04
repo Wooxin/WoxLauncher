@@ -9,6 +9,7 @@
     "instances": "Экземпляры",
     "modBrowser": "Обзор модов",
     "java": "Java",
+    "accounts": "Аккаунты",
     "settings": "Настройки"
   },
   "instance": {
@@ -43,7 +44,13 @@
   "java": {
     "title": "Среды Java",
     "refresh": "Обновить",
-    "noRuntimes": "Среды Java не обнаружены. Установите одну для начала."
+    "noRuntimes": "Среды Java не обнаружены. Установите одну для начала.",
+    "downloadTitle": "Скачать Java",
+    "downloadBtn": "Скачать",
+    "vendorLabel": "Поставщик",
+    "versionLabel": "Версия",
+    "installing": "Установка {{vendor}} {{version}}...",
+    "installed": "{{vendor}} {{version}} успешно установлен"
   },
   "settings": {
     "title": "Настройки",
@@ -56,7 +63,22 @@
     "version": "WoxLauncher",
     "versionValue": "Версия 0.1.0",
     "builtWith": "Технологии",
-    "builtWithValue": "Tauri 2 + React 19 + MUI"
+    "builtWithValue": "Tauri 2 + React 19 + MUI",
+    "appearance": "Внешний вид",
+    "theme": "Тема",
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "download": "Загрузка",
+    "mirror": "Зеркало загрузки",
+    "mirrorOfficial": "Официальное (Mojang)",
+    "mirrorBmclapi": "BMCLAPI (Китай)",
+    "mirrorMcbbs": "MCBBS (Китай)",
+    "maxThreads": "Макс. потоков загрузки",
+    "launch": "Параметры запуска",
+    "defaultJvmArgs": "Стандартные аргументы JVM",
+    "maxMemory": "Макс. память",
+    "autoMemory": "Авто память",
+    "autoMemoryDesc": "Автоматически определять ОЗУ и настраивать память"
   },
   "account": {
     "title": "Аккаунт",
@@ -74,8 +96,16 @@
     "username": "Имя пользователя",
     "password": "Пароль",
     "serverUrl": "URL сервера аутентификации",
+    "active": "Активен",
     "loginSuccess": "Выполнен вход как {{name}}",
-    "loginFailed": "Ошибка входа"
+    "loginFailed": "Ошибка входа",
+    "copyCode": "Копировать код",
+    "codeCopied": "Скопировано！",
+    "openBrowserAgain": "Открыть браузер снова",
+    "expiresIn": "Истекает через {{time}}",
+    "codeExpired": "Код истек. Попробуйте снова",
+    "retry": "Повторить",
+    "cancel": "Отмена"
   },
   "download": {
     "downloading": "Загрузка",
@@ -83,7 +113,8 @@
     "done": "Готово",
     "error": "Ошибка",
     "speed": "{{speed}}",
-    "active": "Загрузки ({{count}} активно)"
+    "active": "Загрузки ({{count}} активно)",
+    "installingVersion": "Загрузка Minecraft {{version}}..."
   },
   "launch": {
     "preparing": "Подготовка игровых ресурсов...",

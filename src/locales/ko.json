@@ -9,6 +9,7 @@
     "instances": "인스턴스",
     "modBrowser": "Mod 브라우저",
     "java": "Java",
+    "accounts": "계정",
     "settings": "설정"
   },
   "instance": {
@@ -43,7 +44,13 @@
   "java": {
     "title": "Java 런타임",
     "refresh": "새로고침",
-    "noRuntimes": "Java 런타임이 감지되지 않았습니다. 설치하여 시작하세요."
+    "noRuntimes": "Java 런타임이 감지되지 않았습니다. 설치하여 시작하세요.",
+    "downloadTitle": "Java 다운로드",
+    "downloadBtn": "다운로드",
+    "vendorLabel": "공급업체",
+    "versionLabel": "버전",
+    "installing": "{{vendor}} {{version}} 설치 중...",
+    "installed": "{{vendor}} {{version}} 설치 완료"
   },
   "settings": {
     "title": "설정",
@@ -56,7 +63,22 @@
     "version": "WoxLauncher",
     "versionValue": "버전 0.1.0",
     "builtWith": "기술 스택",
-    "builtWithValue": "Tauri 2 + React 19 + MUI"
+    "builtWithValue": "Tauri 2 + React 19 + MUI",
+    "appearance": "외관",
+    "theme": "테마",
+    "light": "라이트",
+    "dark": "다크",
+    "download": "다운로드",
+    "mirror": "다운로드 미러",
+    "mirrorOfficial": "공식 (Mojang)",
+    "mirrorBmclapi": "BMCLAPI (중국)",
+    "mirrorMcbbs": "MCBBS (중국)",
+    "maxThreads": "최대 다운로드 스레드",
+    "launch": "실행 기본값",
+    "defaultJvmArgs": "기본 JVM 인수",
+    "maxMemory": "최대 메모리",
+    "autoMemory": "자동 메모리",
+    "autoMemoryDesc": "시스템 RAM을 자동 감지하여 최적 메모리 설정"
   },
   "account": {
     "title": "계정",
@@ -74,8 +96,16 @@
     "username": "사용자 이름",
     "password": "비밀번호",
     "serverUrl": "인증 서버 URL",
+    "active": "활성",
     "loginSuccess": "{{name}}으로 로그인했습니다",
-    "loginFailed": "로그인 실패"
+    "loginFailed": "로그인 실패",
+    "copyCode": "코드 복사",
+    "codeCopied": "복사됨！",
+    "openBrowserAgain": "브라우저 다시 열기",
+    "expiresIn": "{{time}} 후 만료",
+    "codeExpired": "코드가 만료되었습니다. 다시 시도하세요",
+    "retry": "재시도",
+    "cancel": "취소"
   },
   "download": {
     "downloading": "다운로드 중",
@@ -83,7 +113,8 @@
     "done": "완료",
     "error": "오류",
     "speed": "{{speed}}",
-    "active": "다운로드 중 ({{count}} 활성)"
+    "active": "다운로드 중 ({{count}} 활성)",
+    "installingVersion": "Minecraft {{version}} 다운로드 중..."
   },
   "launch": {
     "preparing": "게임 자산 준비 중...",
