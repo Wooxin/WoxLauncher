@@ -13,7 +13,7 @@ import { ALL_LOADERS } from "../constants";
 import { useJavaStore } from "../stores/javaStore";
 import { useModSearch } from "../hooks/useModSearch";
 import { getModrinthMod } from "../services/modrinth";
-import type { InstanceConfig, LoaderType } from "../types";
+import type { InstanceConfig, LoaderType, ModSource } from "../types";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -46,7 +46,8 @@ export default function InstanceDetail() {
   const [modQuery, setModQuery] = useState("");
   const [modVersion, setModVersion] = useState("");
   const [modCategory, setModCategory] = useState("");
-  const { data: modResults } = useModSearch(modQuery, "modrinth", modVersion);
+  const [modSource, setModSource] = useState<ModSource>("modrinth");
+  const { data: modResults } = useModSearch(modQuery, modSource, modVersion);
 
   // Fetch versions for dropdown
   const [releaseVersions, setReleaseVersions] = useState<{ id: string; versionType: string }[]>([]);
@@ -190,6 +191,18 @@ export default function InstanceDetail() {
       <TabPanel value={tab} index={1}>
         {/* Filters row */}
         <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap", alignItems: "center" }}>
+          <TextField
+            select
+            size="small"
+            label={t("mod.source")}
+            value={modSource}
+            onChange={(e) => setModSource(e.target.value as ModSource)}
+            sx={{ minWidth: 120 }}
+          >
+            <MenuItem value="modrinth">Modrinth</MenuItem>
+            <MenuItem value="curseforge" disabled>CurseForge ({t("mod.comingSoon")})</MenuItem>
+            <MenuItem value="mcmod" disabled>MCMod ({t("mod.comingSoon")})</MenuItem>
+          </TextField>
           <TextField
             size="small"
             placeholder={t("mod.searchPlaceholder")}

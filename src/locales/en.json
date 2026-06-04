@@ -43,7 +43,9 @@
     "noResults": "No results found for \"{{query}}\"",
     "downloads": "{{count}} downloads",
     "details": "Mod Detail",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "source": "Source",
+    "category": "Category"
   },
   "java": {
     "title": "Java Runtimes",
