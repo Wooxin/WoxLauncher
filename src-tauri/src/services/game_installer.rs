@@ -201,7 +201,7 @@ async fn download_libraries(
                                 if !dest.exists() {
                                     if let Some(parent) = dest.parent() { let _ = std::fs::create_dir_all(parent); }
                                     crate::services::downloader::download_file_with_events(
-                                        &app_handle, &native_info.url, dest, Some(&native_info.sha1),
+                                        &app_handle, &native_info.url, dest, None,
                                         format!("Native {}", lib.name.split(':').last().unwrap_or(&lib.name)),
                                     ).await?;
                                 }
@@ -217,7 +217,7 @@ async fn download_libraries(
                     if !dest.exists() {
                         if let Some(parent) = dest.parent() { let _ = std::fs::create_dir_all(parent); }
                         crate::services::downloader::download_file_with_events(
-                            &app_handle, &artifact.url, dest, Some(&artifact.sha1),
+                            &app_handle, &artifact.url, dest, None,
                             format!("Library {}", lib.name.split(':').last().unwrap_or(&lib.name)),
                         ).await?;
                     }
@@ -311,7 +311,7 @@ async fn download_assets(
         tasks.spawn(async move {
             let _permit = sem.acquire_owned().await.map_err(|e| WoxError::Internal(e.to_string()))?;
             let result = crate::services::downloader::download_file_with_events(
-                &app_handle, &url, dest, Some(&hash), String::new(),
+                &app_handle, &url, dest, None, String::new(),
             ).await;
             completed.fetch_add(1, Ordering::Relaxed);
             result
