@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Typography, Box, Button, Card, CardContent, MenuItem, Select,
-  FormControl, InputLabel, Chip, CircularProgress,
+  FormControl, InputLabel, Chip, CircularProgress, Snackbar, Alert,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import AddIcon from "@mui/icons-material/Add";
@@ -24,6 +24,9 @@ export default function Home() {
   const [selectedId, setSelectedId] = useState("");
   const [loginOpen, setLoginOpen] = useState(false);
   const [launchStatus, setLaunchStatus] = useState<'idle' | 'installing' | 'launching'>('idle');
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" | "info" }>({
+    open: false, message: "", severity: "info"
+  });
 
   useEffect(() => {
     fetchInstances();
@@ -51,10 +54,10 @@ export default function Home() {
         javaPath,
       });
       setLaunchStatus('idle');
-      alert(t("launch.launched"));
+      setSnackbar({ open: true, message: t("launch.launched"), severity: "success" });
     } catch (e) {
       setLaunchStatus('idle');
-      alert(String(e));
+      setSnackbar({ open: true, message: String(e), severity: "error" });
     }
   };
 
@@ -124,6 +127,16 @@ export default function Home() {
       )}
       </Box>
       <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity={snackbar.severity} onClose={() => setSnackbar((s) => ({ ...s, open: false }))}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

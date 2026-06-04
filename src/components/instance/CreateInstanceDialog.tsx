@@ -5,6 +5,7 @@ import {
 } from "@mui/material";
 import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
+import { useSettingsStore } from "../../stores/settingsStore";
 import { ALL_LOADERS } from "../../constants";
 import type { InstanceConfig, LoaderType, MinecraftVersion } from "../../types";
 
@@ -16,6 +17,7 @@ interface Props {
 
 export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props) {
   const { t } = useTranslation();
+  const { defaultJvmArgs } = useSettingsStore();
   const [name, setName] = useState("");
   const [gameVersion, setGameVersion] = useState<MinecraftVersion | null>(null);
   const [loaderType, setLoaderType] = useState<LoaderType>("vanilla");
@@ -40,7 +42,7 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
       loaderType,
       loaderVersion: "",
       javaVersion: "17",
-      jvmArgs: ["-Xmx2G"],
+      jvmArgs: defaultJvmArgs ? defaultJvmArgs.split(" ").filter(Boolean) : ["-Xmx2G"],
       gameArgs: [],
       resolutionWidth: 1920,
       resolutionHeight: 1080,

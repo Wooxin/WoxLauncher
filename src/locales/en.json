@@ -62,7 +62,20 @@
     "version": "WoxLauncher",
     "versionValue": "Version 0.1.0",
     "builtWith": "Built with",
-    "builtWithValue": "Tauri 2 + React 19 + MUI"
+    "builtWithValue": "Tauri 2 + React 19 + MUI",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "download": "Download",
+    "mirror": "Download Mirror",
+    "mirrorOfficial": "Official (Mojang)",
+    "mirrorBmclapi": "BMCLAPI (China)",
+    "mirrorMcbbs": "MCBBS (China)",
+    "maxThreads": "Max Download Threads",
+    "launch": "Launch Defaults",
+    "defaultJvmArgs": "Default JVM Arguments",
+    "maxMemory": "Max Memory"
   },
   "account": {
     "title": "Account",

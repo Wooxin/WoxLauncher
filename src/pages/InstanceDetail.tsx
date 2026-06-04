@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   Typography, Box, Card, CardContent, Button, Chip,
-  CircularProgress, TextField, MenuItem, Tabs, Tab,
+  CircularProgress, TextField, MenuItem, Tabs, Tab, Snackbar, Alert,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import SaveIcon from "@mui/icons-material/Save";
@@ -37,6 +37,9 @@ export default function InstanceDetail() {
   const [editJvmArgs, setEditJvmArgs] = useState("");
   const [editResW, setEditResW] = useState(1920);
   const [editResH, setEditResH] = useState(1080);
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" | "info" }>({
+    open: false, message: "", severity: "info"
+  });
 
   const { runtimes, fetchRuntimes } = useJavaStore();
   const [modQuery, setModQuery] = useState("");
@@ -79,7 +82,7 @@ export default function InstanceDetail() {
 
   const handleLaunch = async () => {
     if (!instance) return;
-    alert(t("instance.launchPlaceholder", { name: instance.name }));
+    setSnackbar({ open: true, message: t("instance.launchPlaceholder", { name: instance.name }), severity: "info" });
   };
 
   if (loading) return <CircularProgress />;
@@ -176,6 +179,16 @@ export default function InstanceDetail() {
           ))
         )}
       </TabPanel>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity={snackbar.severity} onClose={() => setSnackbar((s) => ({ ...s, open: false }))}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
