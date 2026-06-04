@@ -9,6 +9,7 @@ mod database;
 
 use app_state::AppState;
 use utils::requests;
+use tauri::Manager;
 use tauri::tray::TrayIconBuilder;
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
 

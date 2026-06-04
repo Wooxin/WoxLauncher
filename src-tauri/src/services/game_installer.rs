@@ -179,7 +179,7 @@ async fn download_libraries(
                 false
             }
         } else if let Some(ref downloads) = lib.downloads {
-            if let Some(ref artifact) = downloads.artifact {
+            if let Some(ref _artifact) = downloads.artifact {
                 let dest = get_maven_path(&lib.name);
                 dest.exists()
             } else {
