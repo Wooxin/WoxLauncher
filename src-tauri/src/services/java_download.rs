@@ -86,15 +86,20 @@ pub async fn fetch_download_url(vendor: &str, java_version: &str) -> Result<(Str
     }
 }
 
-/// Download and install Java from a vendor
+/// Download and install Java from a vendor. If custom_path is provided, use it as the base directory.
 pub async fn download_java(
     app_handle: &AppHandle,
     vendor: &str,
     java_version: &str,
+    custom_path: Option<&str>,
 ) -> Result<String, WoxError> {
     let (url, _filename) = fetch_download_url(vendor, java_version).await?;
 
-    let java_target_dir = paths::java_dir().join(format!("{}-{}", vendor, java_version));
+    let base = match custom_path {
+        Some(p) if !p.is_empty() => std::path::PathBuf::from(p),
+        _ => paths::java_dir(),
+    };
+    let java_target_dir = base.join(format!("{}-{}", vendor, java_version));
     std::fs::create_dir_all(&java_target_dir)?;
 
     let (_, _, ext) = get_platform_params();

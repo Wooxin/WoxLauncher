@@ -15,7 +15,7 @@ export default function Settings() {
     theme, setTheme, keepOpen, setKeepOpen,
     downloadMirror, setDownloadMirror, maxDownloadThreads, setMaxDownloadThreads,
     defaultJvmArgs, setDefaultJvmArgs, maxMemoryGb, setMaxMemoryGb,
-    autoMemory, setAutoMemory,
+    autoMemory, setAutoMemory, javaInstallPath, setJavaInstallPath,
   } = useSettingsStore();
 
   return (
@@ -37,7 +37,17 @@ export default function Settings() {
               <Switch checked={keepOpen} onChange={(e) => setKeepOpen(e.target.checked)} />
             </ListItem>
             <ListItem>
-              <ListItemText primary={t("settings.downloadPath")} secondary="~/.woxlauncher" />
+              <ListItemText primary={t("settings.downloadPath")} secondary={t("settings.downloadPathValue")} />
+            </ListItem>
+            <ListItem disablePadding sx={{ mb: 1 }}>
+              <TextField
+                label={t("settings.javaInstallPath")}
+                value={javaInstallPath}
+                onChange={(e) => setJavaInstallPath(e.target.value)}
+                fullWidth size="small"
+                placeholder={t("settings.javaInstallPathDefault")}
+                helperText={t("settings.javaInstallPathHint")}
+              />
             </ListItem>
           </List>
         </CardContent>

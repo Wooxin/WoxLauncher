@@ -8,6 +8,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 import { useJavaStore } from "../stores/javaStore";
+import { useSettingsStore } from "../stores/settingsStore";
 import AsyncState from "../components/common/AsyncState";
 
 const VENDORS = [
@@ -19,20 +20,21 @@ const VENDORS = [
 export default function JavaManager() {
   const { t } = useTranslation();
   const { runtimes, loading, error, fetchRuntimes } = useJavaStore();
+  const javaInstallPath = useSettingsStore((s) => s.javaInstallPath);
   const [vendor, setVendor] = useState("adoptium");
   const [version, setVersion] = useState("21");
   const [dlStatus, setDlStatus] = useState<"idle" | "downloading" | "done" | "error">("idle");
   const [dlError, setDlError] = useState("");
 
-  useEffect(() => { fetchRuntimes(); }, []);
+  useEffect(() => { fetchRuntimes(javaInstallPath); }, [javaInstallPath]);
 
   const handleDownload = async () => {
     setDlStatus("downloading");
     setDlError("");
     try {
-      await invoke("download_java", { vendor, version });
+      await invoke("download_java", { vendor, version, installPath: javaInstallPath || null });
       setDlStatus("done");
-      await fetchRuntimes();
+      await fetchRuntimes(javaInstallPath);
     } catch (e) {
       setDlStatus("error");
       setDlError(String(e));
@@ -45,7 +47,7 @@ export default function JavaManager() {
         <Typography variant="h4" sx={{ fontWeight: 600 }}>
           {t("java.title")}
         </Typography>
-        <Button startIcon={<RefreshIcon />} onClick={fetchRuntimes}>
+        <Button startIcon={<RefreshIcon />} onClick={() => fetchRuntimes(javaInstallPath)}>
           {t("java.refresh")}
         </Button>
       </Box>

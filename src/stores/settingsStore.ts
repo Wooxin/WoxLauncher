@@ -25,6 +25,7 @@ interface SettingsState {
   maxDownloadThreads: number;
   defaultJvmArgs: string;
   maxMemoryGb: number;
+  javaInstallPath: string;
   setTheme: (theme: "dark" | "light") => void;
   setKeepOpen: (keepOpen: boolean) => void;
   setAutoMemory: (auto: boolean) => void;
@@ -32,6 +33,7 @@ interface SettingsState {
   setMaxDownloadThreads: (threads: number) => void;
   setDefaultJvmArgs: (args: string) => void;
   setMaxMemoryGb: (gb: number) => void;
+  setJavaInstallPath: (path: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -44,6 +46,7 @@ export const useSettingsStore = create<SettingsState>()(
       maxDownloadThreads: 4,
       defaultJvmArgs: getAutoJvmArgs(),
       maxMemoryGb: detectMemoryGb(),
+      javaInstallPath: "",
       setTheme: (theme) => set({ theme }),
       setKeepOpen: (keepOpen) => set({ keepOpen }),
       setAutoMemory: (auto) => set((s) => ({
@@ -55,6 +58,7 @@ export const useSettingsStore = create<SettingsState>()(
       setMaxDownloadThreads: (maxDownloadThreads) => set({ maxDownloadThreads }),
       setDefaultJvmArgs: (defaultJvmArgs) => set({ defaultJvmArgs }),
       setMaxMemoryGb: (maxMemoryGb) => set({ maxMemoryGb }),
+      setJavaInstallPath: (javaInstallPath) => set({ javaInstallPath }),
     }),
     {
       name: "woxlauncher-settings",

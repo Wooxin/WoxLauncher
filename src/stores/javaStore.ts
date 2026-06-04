@@ -6,7 +6,7 @@ interface JavaState {
   runtimes: JavaRuntime[];
   loading: boolean;
   error: string | null;
-  fetchRuntimes: () => Promise<void>;
+  fetchRuntimes: (customPath?: string) => Promise<void>;
 }
 
 export const useJavaStore = create<JavaState>((set) => ({
@@ -14,10 +14,10 @@ export const useJavaStore = create<JavaState>((set) => ({
   loading: false,
   error: null,
 
-  fetchRuntimes: async () => {
+  fetchRuntimes: async (customPath?: string) => {
     set({ loading: true, error: null });
     try {
-      const runtimes = await invoke<JavaRuntime[]>("detect_java");
+      const runtimes = await invoke<JavaRuntime[]>("detect_java", { customPath: customPath || null });
       set({ runtimes, loading: false });
     } catch (e) {
       set({ error: String(e), loading: false });

@@ -8,6 +8,8 @@ pub async fn download_java(
     app_handle: tauri::AppHandle,
     vendor: String,
     version: String,
+    install_path: Option<String>,
 ) -> Result<String, WoxError> {
-    java_download::download_java(&app_handle, &vendor, &version).await
+    let path = install_path.filter(|p| !p.is_empty());
+    java_download::download_java(&app_handle, &vendor, &version, path.as_deref()).await
 }

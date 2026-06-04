@@ -3,32 +3,18 @@ use crate::error::WoxError;
 use crate::utils::paths;
 use std::path::PathBuf;
 
-/// Detect installed Java runtimes (both system and managed)
-pub fn detect_installed() -> Result<Vec<JavaRuntime>, WoxError> {
+/// Detect installed Java runtimes (both system and managed).
+/// If custom_path is provided, also scan that directory.
+pub fn detect_installed(custom_path: Option<&str>) -> Result<Vec<JavaRuntime>, WoxError> {
     let mut runtimes = Vec::new();
 
     // Check managed Java dir
-    let managed = paths::java_dir();
-    if managed.exists() {
-        if let Ok(entries) = std::fs::read_dir(&managed) {
-            for entry in entries.flatten() {
-                let java_exe = if cfg!(target_os = "windows") {
-                    entry.path().join("bin").join("java.exe")
-                } else {
-                    entry.path().join("bin").join("java")
-                };
-                if java_exe.exists() {
-                    let folder_name = entry.file_name().to_string_lossy().to_string();
-                    let (vendor, version) = parse_java_folder(&folder_name);
-                    runtimes.push(JavaRuntime {
-                        id: format!("managed-{}", entry.file_name().to_string_lossy()),
-                        vendor,
-                        version,
-                        path: java_exe.to_string_lossy().to_string(),
-                        installed: true,
-                    });
-                }
-            }
+    scan_java_dir(&paths::java_dir(), &mut runtimes, "managed");
+
+    // Check custom path if provided
+    if let Some(p) = custom_path {
+        if !p.is_empty() {
+            scan_java_dir(&PathBuf::from(p), &mut runtimes, "custom");
         }
     }
 
@@ -76,6 +62,30 @@ pub fn detect_installed() -> Result<Vec<JavaRuntime>, WoxError> {
     }
 
     Ok(runtimes)
+}
+
+fn scan_java_dir(dir: &PathBuf, runtimes: &mut Vec<JavaRuntime>, id_prefix: &str) {
+    if !dir.exists() { return; }
+    if let Ok(entries) = std::fs::read_dir(dir) {
+        for entry in entries.flatten() {
+            let java_exe = if cfg!(target_os = "windows") {
+                entry.path().join("bin").join("java.exe")
+            } else {
+                entry.path().join("bin").join("java")
+            };
+            if java_exe.exists() {
+                let folder_name = entry.file_name().to_string_lossy().to_string();
+                let (vendor, version) = parse_java_folder(&folder_name);
+                runtimes.push(JavaRuntime {
+                    id: format!("{}-{}", id_prefix, entry.file_name().to_string_lossy()),
+                    vendor,
+                    version,
+                    path: java_exe.to_string_lossy().to_string(),
+                    installed: true,
+                });
+            }
+        }
+    }
 }
 
 fn detect_java_version(java_path: &str) -> String {
