@@ -1,0 +1,68 @@
+{
+  "app": {
+    "title": "WoxLauncher",
+    "welcome": "Bienvenue sur WoxLauncher",
+    "subtitle": "Un lanceur Minecraft rapide et moderne. Créez une instance pour commencer."
+  },
+  "nav": {
+    "home": "Accueil",
+    "instances": "Instances",
+    "modBrowser": "Navigateur Mod",
+    "java": "Java",
+    "settings": "Paramètres"
+  },
+  "instance": {
+    "title": "Instances",
+    "newInstance": "Nouvelle instance",
+    "noInstances": "Aucune instance. Créez la première !",
+    "lastPlayed": "Dernière partie",
+    "createTitle": "Créer une instance",
+    "instanceName": "Nom de l'instance",
+    "gameVersion": "Version du jeu",
+    "loader": "Loader",
+    "cancel": "Annuler",
+    "create": "Créer",
+    "configuration": "Configuration",
+    "launch": "Lancer",
+    "java": "Java",
+    "javaVersion": "Version {{version}}",
+    "resolution": "Résolution",
+    "jvmArgs": "Arguments JVM",
+    "created": "Créé le",
+    "notFound": "Instance introuvable",
+    "launchPlaceholder": "Lancement de {{name}}... (Authentification et sélection Java à venir)"
+  },
+  "mod": {
+    "title": "Navigateur Mod",
+    "searchPlaceholder": "Rechercher des mods...",
+    "noResults": "Aucun résultat pour \"{{query}}\"",
+    "downloads": "{{count}} téléchargements",
+    "details": "Détails du mod",
+    "comingSoon": "Bientôt disponible"
+  },
+  "java": {
+    "title": "Runtimes Java",
+    "refresh": "Actualiser",
+    "noRuntimes": "Aucun runtime Java détecté. Installez-en un pour commencer."
+  },
+  "settings": {
+    "title": "Paramètres",
+    "general": "Général",
+    "keepOpen": "Garder le lanceur ouvert après le lancement",
+    "keepOpenDesc": "Le lanceur reste disponible pendant le jeu",
+    "downloadPath": "Chemin de téléchargement",
+    "language": "Langue",
+    "about": "À propos",
+    "version": "WoxLauncher",
+    "versionValue": "Version 0.1.0",
+    "builtWith": "Technologies",
+    "builtWithValue": "Tauri 2 + React 19 + MUI"
+  },
+  "common": {
+    "vanilla": "Vanilla",
+    "fabric": "Fabric",
+    "forge": "Forge",
+    "quilt": "Quilt",
+    "unknown": "Inconnu"
+  }
+}

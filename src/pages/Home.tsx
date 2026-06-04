@@ -1,13 +1,15 @@
 import { Typography, Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
+  const { t } = useTranslation();
   return (
     <Box>
       <Typography variant="h4" sx={{ fontWeight: 600, mb: 2 }}>
-        Welcome to WoxLauncher
+        {t("app.welcome")}
       </Typography>
       <Typography variant="body1" color="text.secondary">
-        A fast, modern Minecraft launcher. Create an instance to get started.
+        {t("app.subtitle")}
       </Typography>
     </Box>
   );

@@ -1,0 +1,68 @@
+{
+  "app": {
+    "title": "WoxLauncher",
+    "welcome": "WoxLauncher에 오신 것을 환영합니다",
+    "subtitle": "빠르고 현대적인 Minecraft 런처입니다. 인스턴스를 만들어 시작하세요."
+  },
+  "nav": {
+    "home": "홈",
+    "instances": "인스턴스",
+    "modBrowser": "Mod 브라우저",
+    "java": "Java",
+    "settings": "설정"
+  },
+  "instance": {
+    "title": "인스턴스",
+    "newInstance": "새 인스턴스",
+    "noInstances": "아직 인스턴스가 없습니다. 첫 번째 인스턴스를 만들어보세요!",
+    "lastPlayed": "마지막 플레이",
+    "createTitle": "새 인스턴스 만들기",
+    "instanceName": "인스턴스 이름",
+    "gameVersion": "게임 버전",
+    "loader": "로더",
+    "cancel": "취소",
+    "create": "만들기",
+    "configuration": "설정",
+    "launch": "실행",
+    "java": "Java",
+    "javaVersion": "버전 {{version}}",
+    "resolution": "해상도",
+    "jvmArgs": "JVM 인수",
+    "created": "생성일",
+    "notFound": "인스턴스를 찾을 수 없습니다",
+    "launchPlaceholder": "{{name}} 실행 중... (인증 및 Java 선택은 다음 업데이트에서 추가 예정)"
+  },
+  "mod": {
+    "title": "Mod 브라우저",
+    "searchPlaceholder": "Mod 검색...",
+    "noResults": "\"{{query}}\"에 대한 결과를 찾을 수 없습니다",
+    "downloads": "다운로드 {{count}}회",
+    "details": "Mod 상세",
+    "comingSoon": "곧 출시"
+  },
+  "java": {
+    "title": "Java 런타임",
+    "refresh": "새로고침",
+    "noRuntimes": "Java 런타임이 감지되지 않았습니다. 설치하여 시작하세요."
+  },
+  "settings": {
+    "title": "설정",
+    "general": "일반",
+    "keepOpen": "게임 시작 후 런처 계속 열기",
+    "keepOpenDesc": "플레이 중에도 런처를 사용할 수 있습니다",
+    "downloadPath": "다운로드 경로",
+    "language": "언어",
+    "about": "정보",
+    "version": "WoxLauncher",
+    "versionValue": "버전 0.1.0",
+    "builtWith": "기술 스택",
+    "builtWithValue": "Tauri 2 + React 19 + MUI"
+  },
+  "common": {
+    "vanilla": "바닐라",
+    "fabric": "Fabric",
+    "forge": "Forge",
+    "quilt": "Quilt",
+    "unknown": "알 수 없음"
+  }
+}

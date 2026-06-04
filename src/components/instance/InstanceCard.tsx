@@ -2,7 +2,15 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, Typography, IconButton, Box, Chip } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import { useTranslation } from "react-i18next";
 import type { InstanceConfig } from "../../types";
+
+const LOADER_KEYS: Record<string, string> = {
+  vanilla: "common.vanilla",
+  fabric: "common.fabric",
+  forge: "common.forge",
+  quilt: "common.quilt",
+};
 
 interface Props {
   instance: InstanceConfig;
@@ -10,6 +18,7 @@ interface Props {
 }
 
 export default function InstanceCard({ instance, onDelete }: Props) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -18,10 +27,10 @@ export default function InstanceCard({ instance, onDelete }: Props) {
         <Typography variant="h6">{instance.name}</Typography>
         <Box sx={{ display: "flex", gap: 1, mt: 0.5 }}>
           <Chip label={instance.gameVersion} size="small" />
-          <Chip label={instance.loaderType} size="small" color="primary" />
+          <Chip label={t(LOADER_KEYS[instance.loaderType] || "common.unknown")} size="small" color="primary" />
           {instance.lastPlayedAt && (
             <Typography variant="caption" color="text.secondary" sx={{ ml: "auto" }}>
-              Last played: {new Date(instance.lastPlayedAt).toLocaleDateString()}
+              {t("instance.lastPlayed")}: {new Date(instance.lastPlayedAt).toLocaleDateString()}
             </Typography>
           )}
         </Box>

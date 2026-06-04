@@ -8,6 +8,7 @@ import {
   Button,
   MenuItem,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import type { InstanceConfig, LoaderType } from "../../types";
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props) {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [gameVersion, setGameVersion] = useState("1.21");
   const [loaderType, setLoaderType] = useState<LoaderType>("vanilla");
@@ -42,18 +44,18 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Create New Instance</DialogTitle>
+      <DialogTitle>{t("instance.createTitle")}</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
-          label="Instance Name"
+          label={t("instance.instanceName")}
           fullWidth
           margin="dense"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
         <TextField
-          label="Game Version"
+          label={t("instance.gameVersion")}
           fullWidth
           margin="dense"
           value={gameVersion}
@@ -61,22 +63,22 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
         />
         <TextField
           select
-          label="Loader"
+          label={t("instance.loader")}
           fullWidth
           margin="dense"
           value={loaderType}
           onChange={(e) => setLoaderType(e.target.value as LoaderType)}
         >
-          <MenuItem value="vanilla">Vanilla</MenuItem>
-          <MenuItem value="fabric">Fabric</MenuItem>
-          <MenuItem value="forge">Forge (coming soon)</MenuItem>
-          <MenuItem value="quilt">Quilt (coming soon)</MenuItem>
+          <MenuItem value="vanilla">{t("common.vanilla")}</MenuItem>
+          <MenuItem value="fabric">{t("common.fabric")}</MenuItem>
+          <MenuItem value="forge">{t("common.forge")} ({t("mod.comingSoon")})</MenuItem>
+          <MenuItem value="quilt">{t("common.quilt")} ({t("mod.comingSoon")})</MenuItem>
         </TextField>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t("instance.cancel")}</Button>
         <Button onClick={handleSubmit} variant="contained" disabled={!name.trim()}>
-          Create
+          {t("instance.create")}
         </Button>
       </DialogActions>
     </Dialog>

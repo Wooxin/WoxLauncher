@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Typography, Box, Button, CircularProgress } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { useTranslation } from "react-i18next";
 import { useInstanceStore } from "../stores/instanceStore";
 import InstanceCard from "../components/instance/InstanceCard";
 import CreateInstanceDialog from "../components/instance/CreateInstanceDialog";
 import type { InstanceConfig } from "../types";
 
 export default function Instances() {
+  const { t } = useTranslation();
   const { instances, loading, fetchInstances, createInstance, deleteInstance } =
     useInstanceStore();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -27,14 +29,14 @@ export default function Instances() {
     <Box>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 600 }}>
-          Instances
+          {t("instance.title")}
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setDialogOpen(true)}
         >
-          New Instance
+          {t("instance.newInstance")}
         </Button>
       </Box>
 
@@ -42,7 +44,7 @@ export default function Instances() {
         <CircularProgress />
       ) : instances.length === 0 ? (
         <Typography color="text.secondary">
-          No instances yet. Create your first one!
+          {t("instance.noInstances")}
         </Typography>
       ) : (
         instances.map((inst) => (

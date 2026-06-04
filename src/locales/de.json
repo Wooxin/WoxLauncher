@@ -1,0 +1,68 @@
+{
+  "app": {
+    "title": "WoxLauncher",
+    "welcome": "Willkommen bei WoxLauncher",
+    "subtitle": "Ein schneller, moderner Minecraft-Launcher. Erstelle eine Instanz, um loszulegen."
+  },
+  "nav": {
+    "home": "Start",
+    "instances": "Instanzen",
+    "modBrowser": "Mod-Browser",
+    "java": "Java",
+    "settings": "Einstellungen"
+  },
+  "instance": {
+    "title": "Instanzen",
+    "newInstance": "Neue Instanz",
+    "noInstances": "Noch keine Instanzen. Erstelle deine erste!",
+    "lastPlayed": "Zuletzt gespielt",
+    "createTitle": "Neue Instanz erstellen",
+    "instanceName": "Instanzname",
+    "gameVersion": "Spielversion",
+    "loader": "Loader",
+    "cancel": "Abbrechen",
+    "create": "Erstellen",
+    "configuration": "Konfiguration",
+    "launch": "Starten",
+    "java": "Java",
+    "javaVersion": "Version {{version}}",
+    "resolution": "Auflösung",
+    "jvmArgs": "JVM-Argumente",
+    "created": "Erstellt",
+    "notFound": "Instanz nicht gefunden",
+    "launchPlaceholder": "Starte {{name}}... (Auth & Java-Auswahl in nächster Version)"
+  },
+  "mod": {
+    "title": "Mod-Browser",
+    "searchPlaceholder": "Mods suchen...",
+    "noResults": "Keine Ergebnisse für \"{{query}}\"",
+    "downloads": "{{count}} Downloads",
+    "details": "Mod-Details",
+    "comingSoon": "Demnächst"
+  },
+  "java": {
+    "title": "Java-Runtimes",
+    "refresh": "Aktualisieren",
+    "noRuntimes": "Keine Java-Runtimes erkannt. Installiere eine, um zu beginnen."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "general": "Allgemein",
+    "keepOpen": "Launcher nach Spielstart geöffnet lassen",
+    "keepOpenDesc": "Launcher bleibt während des Spiels verfügbar",
+    "downloadPath": "Download-Pfad",
+    "language": "Sprache",
+    "about": "Über",
+    "version": "WoxLauncher",
+    "versionValue": "Version 0.1.0",
+    "builtWith": "Erstellt mit",
+    "builtWithValue": "Tauri 2 + React 19 + MUI"
+  },
+  "common": {
+    "vanilla": "Vanilla",
+    "fabric": "Fabric",
+    "forge": "Forge",
+    "quilt": "Quilt",
+    "unknown": "Unbekannt"
+  }
+}

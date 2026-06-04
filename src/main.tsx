@@ -6,6 +6,7 @@ import { ThemeProvider, CssBaseline } from "@mui/material";
 import { darkTheme } from "./styles/theme";
 import App from "./App";
 import "./styles/global.css";
+import "./i18n";
 
 const queryClient = new QueryClient();
 

@@ -1,0 +1,68 @@
+{
+  "app": {
+    "title": "WoxLauncher",
+    "welcome": "WoxLauncher へようこそ",
+    "subtitle": "高速でモダンな Minecraft ランチャー。インスタンスを作成して始めましょう。"
+  },
+  "nav": {
+    "home": "ホーム",
+    "instances": "インスタンス",
+    "modBrowser": "Mod ブラウザ",
+    "java": "Java",
+    "settings": "設定"
+  },
+  "instance": {
+    "title": "インスタンス",
+    "newInstance": "新規インスタンス",
+    "noInstances": "インスタンスがありません。最初のインスタンスを作成しましょう！",
+    "lastPlayed": "最終プレイ",
+    "createTitle": "新規インスタンス作成",
+    "instanceName": "インスタンス名",
+    "gameVersion": "ゲームバージョン",
+    "loader": "ローダー",
+    "cancel": "キャンセル",
+    "create": "作成",
+    "configuration": "設定",
+    "launch": "起動",
+    "java": "Java",
+    "javaVersion": "バージョン {{version}}",
+    "resolution": "解像度",
+    "jvmArgs": "JVM 引数",
+    "created": "作成日",
+    "notFound": "インスタンスが見つかりません",
+    "launchPlaceholder": "{{name}} を起動中...（認証とJava選択は次回のアップデートで追加予定）"
+  },
+  "mod": {
+    "title": "Mod ブラウザ",
+    "searchPlaceholder": "Mod を検索...",
+    "noResults": "\"{{query}}\" の結果が見つかりません",
+    "downloads": "{{count}} ダウンロード",
+    "details": "Mod 詳細",
+    "comingSoon": "近日公開"
+  },
+  "java": {
+    "title": "Java ランタイム",
+    "refresh": "更新",
+    "noRuntimes": "Java ランタイムが検出されませんでした。インストールして始めましょう。"
+  },
+  "settings": {
+    "title": "設定",
+    "general": "一般",
+    "keepOpen": "ゲーム起動後もランチャーを開いたままにする",
+    "keepOpenDesc": "プレイ中もランチャーを利用できます",
+    "downloadPath": "ダウンロードパス",
+    "language": "言語",
+    "about": "情報",
+    "version": "WoxLauncher",
+    "versionValue": "バージョン 0.1.0",
+    "builtWith": "技術スタック",
+    "builtWithValue": "Tauri 2 + React 19 + MUI"
+  },
+  "common": {
+    "vanilla": "バニラ",
+    "fabric": "Fabric",
+    "forge": "Forge",
+    "quilt": "Quilt",
+    "unknown": "不明"
+  }
+}

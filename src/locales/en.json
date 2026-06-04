@@ -1,0 +1,68 @@
+{
+  "app": {
+    "title": "WoxLauncher",
+    "welcome": "Welcome to WoxLauncher",
+    "subtitle": "A fast, modern Minecraft launcher. Create an instance to get started."
+  },
+  "nav": {
+    "home": "Home",
+    "instances": "Instances",
+    "modBrowser": "Mod Browser",
+    "java": "Java",
+    "settings": "Settings"
+  },
+  "instance": {
+    "title": "Instances",
+    "newInstance": "New Instance",
+    "noInstances": "No instances yet. Create your first one!",
+    "lastPlayed": "Last played",
+    "createTitle": "Create New Instance",
+    "instanceName": "Instance Name",
+    "gameVersion": "Game Version",
+    "loader": "Loader",
+    "cancel": "Cancel",
+    "create": "Create",
+    "configuration": "Configuration",
+    "launch": "Launch",
+    "java": "Java",
+    "javaVersion": "Version {{version}}",
+    "resolution": "Resolution",
+    "jvmArgs": "JVM Args",
+    "created": "Created",
+    "notFound": "Instance not found",
+    "launchPlaceholder": "Launching {{name}}... (Auth & Java selection coming in next iteration)"
+  },
+  "mod": {
+    "title": "Mod Browser",
+    "searchPlaceholder": "Search mods...",
+    "noResults": "No results found for \"{{query}}\"",
+    "downloads": "{{count}} downloads",
+    "details": "Mod Detail",
+    "comingSoon": "Coming soon"
+  },
+  "java": {
+    "title": "Java Runtimes",
+    "refresh": "Refresh",
+    "noRuntimes": "No Java runtimes detected. Install one to get started."
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "keepOpen": "Keep launcher open after game starts",
+    "keepOpenDesc": "Launcher stays available while playing",
+    "downloadPath": "Download path",
+    "language": "Language",
+    "about": "About",
+    "version": "WoxLauncher",
+    "versionValue": "Version 0.1.0",
+    "builtWith": "Built with",
+    "builtWithValue": "Tauri 2 + React 19 + MUI"
+  },
+  "common": {
+    "vanilla": "Vanilla",
+    "fabric": "Fabric",
+    "forge": "Forge",
+    "quilt": "Quilt",
+    "unknown": "Unknown"
+  }
+}

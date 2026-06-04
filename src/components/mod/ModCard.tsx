@@ -7,6 +7,7 @@ import {
   Chip,
   Box,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import type { ModResult } from "../../types";
 
 interface Props {
@@ -20,6 +21,7 @@ const sourceColor: Record<string, "primary" | "secondary" | "success"> = {
 };
 
 export default function ModCard({ mod }: Props) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -48,7 +50,7 @@ export default function ModCard({ mod }: Props) {
             <Chip key={cat} label={cat} size="small" variant="outlined" />
           ))}
           <Typography variant="caption" color="text.secondary" sx={{ ml: "auto" }}>
-            {mod.downloads.toLocaleString()} downloads
+            {t("mod.downloads", { count: mod.downloads.toLocaleString() })}
           </Typography>
         </Box>
       </CardContent>

@@ -9,9 +9,11 @@ import {
   Button,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { useTranslation } from "react-i18next";
 import { useJavaStore } from "../stores/javaStore";
 
 export default function JavaManager() {
+  const { t } = useTranslation();
   const { runtimes, loading, fetchRuntimes } = useJavaStore();
 
   useEffect(() => {
@@ -22,10 +24,10 @@ export default function JavaManager() {
     <Box>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 600 }}>
-          Java Runtimes
+          {t("java.title")}
         </Typography>
         <Button startIcon={<RefreshIcon />} onClick={fetchRuntimes}>
-          Refresh
+          {t("java.refresh")}
         </Button>
       </Box>
 
@@ -33,7 +35,7 @@ export default function JavaManager() {
         <CircularProgress />
       ) : runtimes.length === 0 ? (
         <Typography color="text.secondary">
-          No Java runtimes detected. Install one to get started.
+          {t("java.noRuntimes")}
         </Typography>
       ) : (
         runtimes.map((rt) => (

@@ -1,0 +1,68 @@
+{
+  "app": {
+    "title": "WoxLauncher",
+    "welcome": "欢迎使用 WoxLauncher",
+    "subtitle": "快速、现代的 Minecraft 启动器。创建一个实例开始吧。"
+  },
+  "nav": {
+    "home": "主页",
+    "instances": "实例",
+    "modBrowser": "Mod 浏览",
+    "java": "Java",
+    "settings": "设置"
+  },
+  "instance": {
+    "title": "实例",
+    "newInstance": "新建实例",
+    "noInstances": "还没有实例，创建第一个吧！",
+    "lastPlayed": "上次游玩",
+    "createTitle": "创建新实例",
+    "instanceName": "实例名称",
+    "gameVersion": "游戏版本",
+    "loader": "加载器",
+    "cancel": "取消",
+    "create": "创建",
+    "configuration": "配置",
+    "launch": "启动",
+    "java": "Java",
+    "javaVersion": "版本 {{version}}",
+    "resolution": "分辨率",
+    "jvmArgs": "JVM 参数",
+    "created": "创建时间",
+    "notFound": "未找到实例",
+    "launchPlaceholder": "正在启动 {{name}}...（认证与 Java 选择将在后续版本中添加）"
+  },
+  "mod": {
+    "title": "Mod 浏览",
+    "searchPlaceholder": "搜索 Mod...",
+    "noResults": "未找到 \"{{query}}\" 的相关结果",
+    "downloads": "{{count}} 次下载",
+    "details": "Mod 详情",
+    "comingSoon": "即将推出"
+  },
+  "java": {
+    "title": "Java 运行时",
+    "refresh": "刷新",
+    "noRuntimes": "未检测到 Java 运行时，请安装一个以开始使用。"
+  },
+  "settings": {
+    "title": "设置",
+    "general": "常规",
+    "keepOpen": "游戏启动后保持启动器开启",
+    "keepOpenDesc": "游戏运行时启动器保持可用",
+    "downloadPath": "下载路径",
+    "language": "语言",
+    "about": "关于",
+    "version": "WoxLauncher",
+    "versionValue": "版本 0.1.0",
+    "builtWith": "技术栈",
+    "builtWithValue": "Tauri 2 + React 19 + MUI"
+  },
+  "common": {
+    "vanilla": "原版",
+    "fabric": "Fabric",
+    "forge": "Forge",
+    "quilt": "Quilt",
+    "unknown": "未知"
+  }
+}

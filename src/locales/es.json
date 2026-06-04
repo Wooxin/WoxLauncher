@@ -1,0 +1,68 @@
+{
+  "app": {
+    "title": "WoxLauncher",
+    "welcome": "Bienvenido a WoxLauncher",
+    "subtitle": "Un lanzador de Minecraft rápido y moderno. Crea una instancia para comenzar."
+  },
+  "nav": {
+    "home": "Inicio",
+    "instances": "Instancias",
+    "modBrowser": "Explorar Mods",
+    "java": "Java",
+    "settings": "Ajustes"
+  },
+  "instance": {
+    "title": "Instancias",
+    "newInstance": "Nueva instancia",
+    "noInstances": "Sin instancias. ¡Crea la primera!",
+    "lastPlayed": "Última partida",
+    "createTitle": "Crear instancia",
+    "instanceName": "Nombre de instancia",
+    "gameVersion": "Versión del juego",
+    "loader": "Cargador",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "configuration": "Configuración",
+    "launch": "Iniciar",
+    "java": "Java",
+    "javaVersion": "Versión {{version}}",
+    "resolution": "Resolución",
+    "jvmArgs": "Argumentos JVM",
+    "created": "Creado",
+    "notFound": "Instancia no encontrada",
+    "launchPlaceholder": "Iniciando {{name}}... (Autenticación y selección de Java próximamente)"
+  },
+  "mod": {
+    "title": "Explorar Mods",
+    "searchPlaceholder": "Buscar mods...",
+    "noResults": "Sin resultados para \"{{query}}\"",
+    "downloads": "{{count}} descargas",
+    "details": "Detalles del mod",
+    "comingSoon": "Próximamente"
+  },
+  "java": {
+    "title": "Runtimes de Java",
+    "refresh": "Actualizar",
+    "noRuntimes": "No se detectaron runtimes de Java. Instala uno para comenzar."
+  },
+  "settings": {
+    "title": "Ajustes",
+    "general": "General",
+    "keepOpen": "Mantener el lanzador abierto tras iniciar el juego",
+    "keepOpenDesc": "El lanzador permanece disponible mientras juegas",
+    "downloadPath": "Ruta de descarga",
+    "language": "Idioma",
+    "about": "Acerca de",
+    "version": "WoxLauncher",
+    "versionValue": "Versión 0.1.0",
+    "builtWith": "Creado con",
+    "builtWithValue": "Tauri 2 + React 19 + MUI"
+  },
+  "common": {
+    "vanilla": "Vanilla",
+    "fabric": "Fabric",
+    "forge": "Forge",
+    "quilt": "Quilt",
+    "unknown": "Desconocido"
+  }
+}

@@ -14,12 +14,21 @@ import {
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { invoke } from "@tauri-apps/api/core";
+import { useTranslation } from "react-i18next";
 import type { InstanceConfig } from "../types";
+
+const LOADER_KEYS: Record<string, string> = {
+  vanilla: "common.vanilla",
+  fabric: "common.fabric",
+  forge: "common.forge",
+  quilt: "common.quilt",
+};
 
 export default function InstanceDetail() {
   const { id } = useParams<{ id: string }>();
   const [instance, setInstance] = useState<InstanceConfig | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   const fetchInstance = async () => {
     if (!id) return;
@@ -35,12 +44,12 @@ export default function InstanceDetail() {
   const handleLaunch = async () => {
     if (!instance) return;
     alert(
-      `Launching ${instance.name}... (Auth & Java selection coming in next iteration)`
+      t("instance.launchPlaceholder", { name: instance.name })
     );
   };
 
   if (loading) return <CircularProgress />;
-  if (!instance) return <Typography>Instance not found</Typography>;
+  if (!instance) return <Typography>{t("instance.notFound")}</Typography>;
 
   return (
     <Box>
@@ -49,46 +58,51 @@ export default function InstanceDetail() {
           {instance.name}
         </Typography>
         <Button variant="contained" startIcon={<PlayArrowIcon />} onClick={handleLaunch}>
-          Launch
+          {t("instance.launch")}
         </Button>
       </Box>
 
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h6" sx={{ mb: 2 }}>
-            Configuration
+            {t("instance.configuration")}
           </Typography>
           <List dense>
             <ListItem>
               <ListItemText
-                primary="Game Version"
+                primary={t("instance.gameVersion")}
                 secondary={instance.gameVersion}
               />
             </ListItem>
             <ListItem>
               <ListItemText
-                primary="Loader"
-                secondary={<Chip label={instance.loaderType} size="small" />}
+                primary={t("instance.loader")}
+                secondary={
+                  <Chip
+                    label={t(LOADER_KEYS[instance.loaderType] || "common.unknown")}
+                    size="small"
+                  />
+                }
               />
             </ListItem>
             <ListItem>
-              <ListItemText primary="Java" secondary={`Version ${instance.javaVersion}`} />
+              <ListItemText primary={t("instance.java")} secondary={t("instance.javaVersion", { version: instance.javaVersion })} />
             </ListItem>
             <ListItem>
               <ListItemText
-                primary="Resolution"
+                primary={t("instance.resolution")}
                 secondary={`${instance.resolutionWidth} x ${instance.resolutionHeight}`}
               />
             </ListItem>
             <ListItem>
               <ListItemText
-                primary="JVM Args"
+                primary={t("instance.jvmArgs")}
                 secondary={instance.jvmArgs.join(" ")}
               />
             </ListItem>
             <ListItem>
               <ListItemText
-                primary="Created"
+                primary={t("instance.created")}
                 secondary={new Date(instance.createdAt).toLocaleDateString()}
               />
             </ListItem>

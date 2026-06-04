@@ -13,22 +13,24 @@ import FolderIcon from "@mui/icons-material/Folder";
 import ExtensionIcon from "@mui/icons-material/Extension";
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
   width: number;
 }
 
-const navItems = [
-  { path: "/", label: "Home", icon: <HomeIcon /> },
-  { path: "/instances", label: "Instances", icon: <FolderIcon /> },
-  { path: "/mods", label: "Mod Browser", icon: <ExtensionIcon /> },
-  { path: "/java", label: "Java", icon: <CoffeeIcon /> },
-  { path: "/settings", label: "Settings", icon: <SettingsIcon /> },
-];
-
 export default function Sidebar({ width }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const navItems = [
+    { path: "/", label: t("nav.home"), icon: <HomeIcon /> },
+    { path: "/instances", label: t("nav.instances"), icon: <FolderIcon /> },
+    { path: "/mods", label: t("nav.modBrowser"), icon: <ExtensionIcon /> },
+    { path: "/java", label: t("nav.java"), icon: <CoffeeIcon /> },
+    { path: "/settings", label: t("nav.settings"), icon: <SettingsIcon /> },
+  ];
 
   return (
     <Drawer
@@ -47,7 +49,7 @@ export default function Sidebar({ width }: SidebarProps) {
     >
       <Box sx={{ p: 2, pt: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 700 }} color="primary.main">
-          WoxLauncher
+          {t("app.title")}
         </Typography>
       </Box>
       <List>
