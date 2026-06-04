@@ -58,6 +58,42 @@
     "builtWith": "Технологии",
     "builtWithValue": "Tauri 2 + React 19 + MUI"
   },
+  "account": {
+    "title": "Аккаунт",
+    "addAccount": "Добавить аккаунт",
+    "switchAccount": "Сменить аккаунт",
+    "notLoggedIn": "Не выполнен вход",
+    "login": "Войти",
+    "logout": "Выйти",
+    "microsoft": "Microsoft",
+    "offline": "Офлайн",
+    "authlib": "AuthLib Injector",
+    "userCode": "Код: {{code}}",
+    "openBrowser": "Откройте {{url}} в браузере и введите код",
+    "polling": "Ожидание аутентификации...",
+    "username": "Имя пользователя",
+    "password": "Пароль",
+    "serverUrl": "URL сервера аутентификации",
+    "loginSuccess": "Выполнен вход как {{name}}",
+    "loginFailed": "Ошибка входа"
+  },
+  "download": {
+    "downloading": "Загрузка",
+    "verifying": "Проверка",
+    "done": "Готово",
+    "error": "Ошибка",
+    "speed": "{{speed}}",
+    "active": "Загрузки ({{count}} активно)"
+  },
+  "launch": {
+    "preparing": "Подготовка игровых ресурсов...",
+    "starting": "Запуск Minecraft...",
+    "launched": "Игра запущена!",
+    "errorAuth": "Не выполнен вход. Сначала добавьте аккаунт.",
+    "errorNoJava": "Среда Java не найдена. Установите Java.",
+    "errorNetwork": "Ошибка сети. Проверьте подключение.",
+    "assetsDownloaded": "Ресурсы успешно загружены"
+  },
   "common": {
     "vanilla": "Ванилла",
     "fabric": "Fabric",

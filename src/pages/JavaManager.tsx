@@ -4,17 +4,17 @@ import {
   Box,
   Card,
   CardContent,
-  CircularProgress,
   Chip,
   Button,
 } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useTranslation } from "react-i18next";
 import { useJavaStore } from "../stores/javaStore";
+import AsyncState from "../components/common/AsyncState";
 
 export default function JavaManager() {
   const { t } = useTranslation();
-  const { runtimes, loading, fetchRuntimes } = useJavaStore();
+  const { runtimes, loading, error, fetchRuntimes } = useJavaStore();
 
   useEffect(() => {
     fetchRuntimes();
@@ -31,14 +31,13 @@ export default function JavaManager() {
         </Button>
       </Box>
 
-      {loading ? (
-        <CircularProgress />
-      ) : runtimes.length === 0 ? (
-        <Typography color="text.secondary">
-          {t("java.noRuntimes")}
-        </Typography>
-      ) : (
-        runtimes.map((rt) => (
+      <AsyncState
+        loading={loading}
+        error={error}
+        empty={runtimes.length === 0}
+        emptyMessage={t("java.noRuntimes")}
+      >
+        {runtimes.map((rt) => (
           <Card key={rt.id} sx={{ mb: 2 }}>
             <CardContent
               sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
@@ -54,8 +53,8 @@ export default function JavaManager() {
               <Chip label={rt.id} size="small" color="primary" variant="outlined" />
             </CardContent>
           </Card>
-        ))
-      )}
+        ))}
+      </AsyncState>
     </Box>
   );
 }

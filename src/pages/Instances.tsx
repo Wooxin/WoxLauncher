@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { Typography, Box, Button, CircularProgress } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useTranslation } from "react-i18next";
 import { useInstanceStore } from "../stores/instanceStore";
 import InstanceCard from "../components/instance/InstanceCard";
 import CreateInstanceDialog from "../components/instance/CreateInstanceDialog";
+import AsyncState from "../components/common/AsyncState";
 import type { InstanceConfig } from "../types";
 
 export default function Instances() {
   const { t } = useTranslation();
-  const { instances, loading, fetchInstances, createInstance, deleteInstance } =
+  const { instances, loading, error, fetchInstances, createInstance, deleteInstance } =
     useInstanceStore();
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -40,17 +41,16 @@ export default function Instances() {
         </Button>
       </Box>
 
-      {loading ? (
-        <CircularProgress />
-      ) : instances.length === 0 ? (
-        <Typography color="text.secondary">
-          {t("instance.noInstances")}
-        </Typography>
-      ) : (
-        instances.map((inst) => (
+      <AsyncState
+        loading={loading}
+        error={error}
+        empty={instances.length === 0}
+        emptyMessage={t("instance.noInstances")}
+      >
+        {instances.map((inst) => (
           <InstanceCard key={inst.id} instance={inst} onDelete={handleDelete} />
-        ))
-      )}
+        ))}
+      </AsyncState>
 
       <CreateInstanceDialog
         open={dialogOpen}

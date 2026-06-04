@@ -12,9 +12,12 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
+import { useSettingsStore } from "../stores/settingsStore";
 
 export default function Settings() {
   const { t } = useTranslation();
+  const { keepOpen, setKeepOpen } = useSettingsStore();
+
   return (
     <Box>
       <Typography variant="h4" sx={{ fontWeight: 600, mb: 3 }}>
@@ -32,7 +35,7 @@ export default function Settings() {
                 primary={t("settings.keepOpen")}
                 secondary={t("settings.keepOpenDesc")}
               />
-              <Switch defaultChecked />
+              <Switch checked={keepOpen} onChange={(e) => setKeepOpen(e.target.checked)} />
             </ListItem>
             <ListItem>
               <ListItemText

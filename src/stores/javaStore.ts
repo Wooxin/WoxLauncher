@@ -5,16 +5,22 @@ import type { JavaRuntime } from "../types";
 interface JavaState {
   runtimes: JavaRuntime[];
   loading: boolean;
+  error: string | null;
   fetchRuntimes: () => Promise<void>;
 }
 
 export const useJavaStore = create<JavaState>((set) => ({
   runtimes: [],
   loading: false,
+  error: null,
 
   fetchRuntimes: async () => {
-    set({ loading: true });
-    const runtimes = await invoke<JavaRuntime[]>("detect_java");
-    set({ runtimes, loading: false });
+    set({ loading: true, error: null });
+    try {
+      const runtimes = await invoke<JavaRuntime[]>("detect_java");
+      set({ runtimes, loading: false });
+    } catch (e) {
+      set({ error: String(e), loading: false });
+    }
   },
 }));

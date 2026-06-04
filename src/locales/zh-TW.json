@@ -58,6 +58,42 @@
     "builtWith": "技術棧",
     "builtWithValue": "Tauri 2 + React 19 + MUI"
   },
+  "account": {
+    "title": "帳戶",
+    "addAccount": "新增帳戶",
+    "switchAccount": "切換帳戶",
+    "notLoggedIn": "未登入",
+    "login": "登入",
+    "logout": "登出",
+    "microsoft": "Microsoft",
+    "offline": "離線",
+    "authlib": "AuthLib Injector",
+    "userCode": "代碼：{{code}}",
+    "openBrowser": "開啟瀏覽器前往 {{url}} 並輸入代碼",
+    "polling": "等待認證中...",
+    "username": "使用者名稱",
+    "password": "密碼",
+    "serverUrl": "認證伺服器 URL",
+    "loginSuccess": "已登入為 {{name}}",
+    "loginFailed": "登入失敗"
+  },
+  "download": {
+    "downloading": "下載中",
+    "verifying": "驗證中",
+    "done": "完成",
+    "error": "錯誤",
+    "speed": "{{speed}}",
+    "active": "下載中（{{count}} 活躍）"
+  },
+  "launch": {
+    "preparing": "正在準備遊戲資源...",
+    "starting": "正在啟動 Minecraft...",
+    "launched": "遊戲已啟動！",
+    "errorAuth": "未登入。請先新增帳戶。",
+    "errorNoJava": "未找到 Java 執行環境。請安裝 Java。",
+    "errorNetwork": "網路錯誤。請檢查網路連線。",
+    "assetsDownloaded": "資源下載成功"
+  },
   "common": {
     "vanilla": "原版",
     "fabric": "Fabric",

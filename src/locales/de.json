@@ -58,6 +58,42 @@
     "builtWith": "Erstellt mit",
     "builtWithValue": "Tauri 2 + React 19 + MUI"
   },
+  "account": {
+    "title": "Konto",
+    "addAccount": "Konto hinzufügen",
+    "switchAccount": "Konto wechseln",
+    "notLoggedIn": "Nicht angemeldet",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "microsoft": "Microsoft",
+    "offline": "Offline",
+    "authlib": "AuthLib Injector",
+    "userCode": "Code: {{code}}",
+    "openBrowser": "Öffnen Sie {{url}} im Browser und geben Sie den Code ein",
+    "polling": "Warte auf Authentifizierung...",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "serverUrl": "Auth-Server-URL",
+    "loginSuccess": "Angemeldet als {{name}}",
+    "loginFailed": "Anmeldung fehlgeschlagen"
+  },
+  "download": {
+    "downloading": "Download",
+    "verifying": "Überprüfung",
+    "done": "Fertig",
+    "error": "Fehler",
+    "speed": "{{speed}}",
+    "active": "Downloads ({{count}} aktiv)"
+  },
+  "launch": {
+    "preparing": "Spielressourcen werden vorbereitet...",
+    "starting": "Minecraft wird gestartet...",
+    "launched": "Spiel gestartet!",
+    "errorAuth": "Nicht angemeldet. Bitte fügen Sie zuerst ein Konto hinzu.",
+    "errorNoJava": "Keine Java-Runtime gefunden. Bitte installieren Sie Java.",
+    "errorNetwork": "Netzwerkfehler. Überprüfen Sie Ihre Verbindung.",
+    "assetsDownloaded": "Ressourcen erfolgreich heruntergeladen"
+  },
   "common": {
     "vanilla": "Vanilla",
     "fabric": "Fabric",

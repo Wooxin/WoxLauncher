@@ -58,6 +58,42 @@
     "builtWith": "技術スタック",
     "builtWithValue": "Tauri 2 + React 19 + MUI"
   },
+  "account": {
+    "title": "アカウント",
+    "addAccount": "アカウントを追加",
+    "switchAccount": "アカウントを切り替え",
+    "notLoggedIn": "未ログイン",
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "microsoft": "Microsoft",
+    "offline": "オフライン",
+    "authlib": "AuthLib Injector",
+    "userCode": "コード：{{code}}",
+    "openBrowser": "ブラウザで {{url}} を開きコードを入力",
+    "polling": "認証を待っています...",
+    "username": "ユーザー名",
+    "password": "パスワード",
+    "serverUrl": "認証サーバー URL",
+    "loginSuccess": "{{name}} としてログインしました",
+    "loginFailed": "ログインに失敗しました"
+  },
+  "download": {
+    "downloading": "ダウンロード中",
+    "verifying": "検証中",
+    "done": "完了",
+    "error": "エラー",
+    "speed": "{{speed}}",
+    "active": "ダウンロード中（{{count}} アクティブ）"
+  },
+  "launch": {
+    "preparing": "ゲームアセットを準備中...",
+    "starting": "Minecraft を起動中...",
+    "launched": "ゲームが起動しました！",
+    "errorAuth": "ログインしていません。先にアカウントを追加してください。",
+    "errorNoJava": "Java ランタイムが見つかりません。Java をインストールしてください。",
+    "errorNetwork": "ネットワークエラー。接続を確認してください。",
+    "assetsDownloaded": "アセットのダウンロードが完了しました"
+  },
   "common": {
     "vanilla": "バニラ",
     "fabric": "Fabric",

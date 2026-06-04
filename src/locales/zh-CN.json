@@ -58,6 +58,42 @@
     "builtWith": "技术栈",
     "builtWithValue": "Tauri 2 + React 19 + MUI"
   },
+  "account": {
+    "title": "账户",
+    "addAccount": "添加账户",
+    "switchAccount": "切换账户",
+    "notLoggedIn": "未登录",
+    "login": "登录",
+    "logout": "登出",
+    "microsoft": "Microsoft",
+    "offline": "离线",
+    "authlib": "AuthLib Injector",
+    "userCode": "代码：{{code}}",
+    "openBrowser": "打开浏览器访问 {{url}} 并输入代码",
+    "polling": "等待认证中...",
+    "username": "用户名",
+    "password": "密码",
+    "serverUrl": "认证服务器 URL",
+    "loginSuccess": "已登录为 {{name}}",
+    "loginFailed": "登录失败"
+  },
+  "download": {
+    "downloading": "下载中",
+    "verifying": "验证中",
+    "done": "完成",
+    "error": "错误",
+    "speed": "{{speed}}",
+    "active": "下载中（{{count}} 活跃）"
+  },
+  "launch": {
+    "preparing": "正在准备游戏资源...",
+    "starting": "正在启动 Minecraft...",
+    "launched": "游戏已启动！",
+    "errorAuth": "未登录。请先添加账户。",
+    "errorNoJava": "未找到 Java 运行时。请安装 Java。",
+    "errorNetwork": "网络错误。请检查网络连接。",
+    "assetsDownloaded": "资源下载成功"
+  },
   "common": {
     "vanilla": "原版",
     "fabric": "Fabric",
