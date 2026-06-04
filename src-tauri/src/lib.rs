@@ -68,6 +68,7 @@ pub fn run() {
             commands::java::detect_java,
             commands::minecraft::fetch_version_manifest,
             commands::download::start_download,
+            commands::download::get_wox_data_dir,
             commands::java_download::download_java,
             commands::game_installer::install_game_version,
         ])

@@ -264,7 +264,8 @@ export default function InstanceDetail() {
                       try {
                         const dl = await getModrinthDownloadUrl(mod.id, modVersion || undefined);
                         if (!dl) { setSnackbar({ open: true, message: `${mod.name}: no download URL`, severity: "error" }); return; }
-                        const dest = `./wox_data/instances/${instance.id}/mods/${dl.filename}`;
+                        const dataDir = await invoke<string>("get_wox_data_dir");
+                        const dest = `${dataDir}/instances/${instance.id}/mods/${dl.filename}`;
                         await invoke("start_download", { url: dl.url, dest, sha1: null, label: mod.name });
                         setSnackbar({ open: true, message: `${mod.name} downloaded`, severity: "success" });
                       } catch (err) {
