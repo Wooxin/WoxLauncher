@@ -7,8 +7,10 @@ import {
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import AddIcon from "@mui/icons-material/Add";
 import { useTranslation } from "react-i18next";
+import { invoke } from "@tauri-apps/api/core";
 import { useInstanceStore } from "../stores/instanceStore";
 import { useAccountStore } from "../stores/accountStore";
+import { useJavaStore } from "../stores/javaStore";
 import AccountPicker from "../components/account/AccountPicker";
 import LoginDialog from "../components/account/LoginDialog";
 
@@ -23,21 +25,36 @@ export default function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { instances, loading, fetchInstances } = useInstanceStore();
-  const { activeAccount } = useAccountStore();
+  const { activeAccount, fetchAccounts } = useAccountStore();
+  const { runtimes, fetchRuntimes } = useJavaStore();
   const [selectedId, setSelectedId] = useState("");
   const [loginOpen, setLoginOpen] = useState(false);
 
-  useEffect(() => { fetchInstances(); }, []);
+  useEffect(() => {
+    fetchInstances();
+    fetchAccounts();
+    fetchRuntimes();
+  }, []);
 
   const selected = instances.find(i => i.id === selectedId) || null;
 
-  const handleLaunch = () => {
+  const handleLaunch = async () => {
     if (!selected) return;
     if (!activeAccount) {
       setLoginOpen(true);
       return;
     }
-    navigate(`/instances/${selected.id}`);
+    const javaPath = runtimes.length > 0 ? runtimes[0].path : "java";
+    try {
+      await invoke("launch_game", {
+        instance: selected,
+        accountUuid: activeAccount.uuid,
+        javaPath,
+      });
+      alert(t("launch.launched"));
+    } catch (e) {
+      alert(String(e));
+    }
   };
 
   if (loading) return <CircularProgress />;
