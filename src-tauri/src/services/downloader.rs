@@ -100,6 +100,8 @@ pub async fn download_file(
         }).await.map_err(|e| WoxError::Internal(e.to_string()))?;
 
         if let Err(e) = result {
+            // Delete corrupted file so retry re-downloads it
+            let _ = std::fs::remove_file(&dest);
             return Err(WoxError::Validation(e));
         }
     }
