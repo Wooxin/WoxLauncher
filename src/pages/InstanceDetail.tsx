@@ -12,7 +12,6 @@ import { useTranslation } from "react-i18next";
 import { ALL_LOADERS } from "../constants";
 import { useJavaStore } from "../stores/javaStore";
 import { useModSearch } from "../hooks/useModSearch";
-import ModCard from "../components/mod/ModCard";
 import { getModrinthMod } from "../services/modrinth";
 import type { InstanceConfig, LoaderType } from "../types";
 
@@ -45,7 +44,19 @@ export default function InstanceDetail() {
 
   const { runtimes, fetchRuntimes } = useJavaStore();
   const [modQuery, setModQuery] = useState("");
-  const { data: modResults } = useModSearch(modQuery, "modrinth");
+  const [modVersion, setModVersion] = useState("");
+  const [modCategory, setModCategory] = useState("");
+  const { data: modResults } = useModSearch(modQuery, "modrinth", modVersion);
+
+  // Fetch versions for dropdown
+  const [releaseVersions, setReleaseVersions] = useState<{ id: string; versionType: string }[]>([]);
+  useEffect(() => {
+    invoke<{ id: string; versionType: string }[]>("fetch_version_manifest")
+      .then(v => setReleaseVersions(v.filter((v: any) => v.versionType === "release")))
+      .catch(() => {});
+  }, []);
+
+  const MOD_CATEGORIES = ["Adventure", "Combat", "Decoration", "Food", "Magic", "Optimization", "Technology", "Utility", "World Gen"];
 
   const fetchInstance = async () => {
     if (!id) return;
@@ -177,37 +188,95 @@ export default function InstanceDetail() {
       </TabPanel>
 
       <TabPanel value={tab} index={1}>
-        <TextField
-          fullWidth
-          placeholder={t("mod.searchPlaceholder")}
-          value={modQuery}
-          onChange={(e) => setModQuery(e.target.value)}
-          sx={{ mb: 2 }}
-          helperText={instance ? `Filtered by Minecraft ${instance.gameVersion}` : ""}
-        />
-        {modResults?.map((mod) => (
-          <Box key={`${mod.source}-${mod.id}`} sx={{ mb: 1 }}>
-            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
-              <Box sx={{ flex: 1 }}>
-                <ModCard mod={mod} />
-              </Box>
-              <IconButton size="small" color="primary"
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  try {
-                    const modDetail = await getModrinthMod(mod.id);
-                    const dlUrl = (modDetail as any).downloadUrl || `https://modrinth.com/mod/${mod.id}`;
-                    setSnackbar({ open: true, message: `Download URL: ${dlUrl}`, severity: "info" });
-                  } catch {}
-                }}
-              >
-                <DownloadIcon />
-              </IconButton>
-            </Box>
-          </Box>
-        ))}
+        {/* Filters row */}
+        <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap", alignItems: "center" }}>
+          <TextField
+            size="small"
+            placeholder={t("mod.searchPlaceholder")}
+            value={modQuery}
+            onChange={(e) => setModQuery(e.target.value)}
+            sx={{ flex: 1, minWidth: 160 }}
+          />
+          <TextField
+            select
+            size="small"
+            label={t("instance.gameVersion")}
+            value={modVersion}
+            onChange={(e) => setModVersion(e.target.value)}
+            sx={{ minWidth: 120 }}
+          >
+            <MenuItem value="">{t("instance.gameVersion")} (all)</MenuItem>
+            {releaseVersions.slice(0, 20).map((v) => (
+              <MenuItem key={v.id} value={v.id}>{v.id}</MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            select
+            size="small"
+            label={t("mod.category")}
+            value={modCategory}
+            onChange={(e) => setModCategory(e.target.value)}
+            sx={{ minWidth: 130 }}
+          >
+            <MenuItem value="">All</MenuItem>
+            {MOD_CATEGORIES.map((c) => (
+              <MenuItem key={c} value={c}>{c}</MenuItem>
+            ))}
+          </TextField>
+        </Box>
+
+        {/* Two-column mod grid */}
+        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
+          {modResults?.map((mod) => (
+            <Card key={`${mod.source}-${mod.id}`} sx={{
+              position: "relative",
+              cursor: "pointer",
+              "&:hover": { bgcolor: "action.hover" },
+            }}>
+              <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  {mod.iconUrl && (
+                    <Box component="img" src={mod.iconUrl} sx={{ width: 40, height: 40, borderRadius: 1, objectFit: "contain", flexShrink: 0 }} />
+                  )}
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600, pr: 5 }} noWrap>{mod.name}</Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", lineClamp: 2, WebkitLineClamp: 2, overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {mod.summary}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", mt: 1 }}>
+                  <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+                    {mod.categories.slice(0, 2).map((cat) => (
+                      <Chip key={cat} label={cat} size="small" variant="outlined" sx={{ height: 18, fontSize: 10 }} />
+                    ))}
+                  </Box>
+                  <IconButton size="small" color="primary"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        const modDetail = await getModrinthMod(mod.id);
+                        const ver = (modDetail as any).versions?.[0] || "";
+                        setSnackbar({ open: true, message: `${mod.name} ${ver}`, severity: "info" });
+                      } catch {}
+                    }}
+                  >
+                    <DownloadIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </CardContent>
+              <Chip
+                label={mod.source}
+                size="small"
+                color="primary"
+                sx={{ position: "absolute", top: 4, right: 4, height: 18, fontSize: 10 }}
+              />
+            </Card>
+          ))}
+        </Box>
+
         {modResults?.length === 0 && modQuery && (
-          <Typography color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>
+          <Typography color="text.secondary" sx={{ textAlign: "center", mt: 4 }}>
             {t("mod.noResults", { query: modQuery })}
           </Typography>
         )}
