@@ -13,12 +13,13 @@ interface Props {
 
 export default function LoginDialog({ open, onClose }: Props) {
   const { t } = useTranslation();
-  const { loginOffline, msLogin, loginAuthlib, loading, error } = useAccountStore();
+  const { loginOffline, msLogin, loginAuthlib, error } = useAccountStore();
   const [tab, setTab] = useState(0);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [serverUrl, setServerUrl] = useState("");
   const [localError, setLocalError] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -27,39 +28,37 @@ export default function LoginDialog({ open, onClose }: Props) {
       setPassword("");
       setServerUrl("");
       setLocalError("");
+      setLoginLoading(false);
     }
   }, [open]);
 
-  const handleMicrosoftLogin = async () => {
+  const handleMicrosoftLogin = () => {
     setLocalError("");
-    try {
-      await msLogin();
-      onClose();
-    } catch (e) {
-      setLocalError(typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e));
-    }
+    setLoginLoading(true);
+    msLogin()
+      .then(() => onClose())
+      .catch((e) => setLocalError(typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)))
+      .finally(() => setLoginLoading(false));
   };
 
-  const handleOfflineLogin = async () => {
+  const handleOfflineLogin = () => {
     if (!username.trim()) return;
     setLocalError("");
-    try {
-      await loginOffline(username);
-      onClose();
-    } catch (e) {
-      setLocalError(typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e));
-    }
+    setLoginLoading(true);
+    loginOffline(username)
+      .then(() => onClose())
+      .catch((e) => setLocalError(typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)))
+      .finally(() => setLoginLoading(false));
   };
 
-  const handleAuthlibLogin = async () => {
+  const handleAuthlibLogin = () => {
     if (!username.trim()) return;
     setLocalError("");
-    try {
-      await loginAuthlib(serverUrl, username, password);
-      onClose();
-    } catch (e) {
-      setLocalError(typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e));
-    }
+    setLoginLoading(true);
+    loginAuthlib(serverUrl, username, password)
+      .then(() => onClose())
+      .catch((e) => setLocalError(typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)))
+      .finally(() => setLoginLoading(false));
   };
 
   return (
@@ -75,7 +74,7 @@ export default function LoginDialog({ open, onClose }: Props) {
 
         {tab === 0 && (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1, alignItems: "center" }}>
-            {loading ? (
+            {loginLoading ? (
               <Box sx={{ textAlign: "center", py: 3 }}>
                 <CircularProgress size={32} sx={{ mb: 2 }} />
                 <Typography>{t("account.polling")}</Typography>
