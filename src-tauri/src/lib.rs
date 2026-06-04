@@ -16,7 +16,6 @@ use tauri::menu::{MenuBuilder, MenuItemBuilder};
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_tray::init())
         .manage(AppState {
             http: requests::http_client().clone(),
         })

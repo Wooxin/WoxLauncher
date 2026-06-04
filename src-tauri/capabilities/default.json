@@ -6,7 +6,6 @@
   "permissions": [
     "core:default",
     "opener:default",
-    "opener:allow-open-url",
-    "tray:default"
+    "opener:allow-open-url"
   ]
 }
