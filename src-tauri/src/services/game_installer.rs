@@ -288,10 +288,18 @@ async fn download_assets(
         let hash = obj.hash.clone();
         let first2 = hash[..2].to_string();
         let dest = objects_dir.join(format!("{}/{}", first2, hash));
+        let expected_size = obj.size;
 
+        // Skip only if file exists AND has correct size
         if dest.exists() {
-            completed.fetch_add(1, Ordering::Relaxed);
-            continue;
+            if let Ok(meta) = std::fs::metadata(&dest) {
+                if meta.len() == expected_size {
+                    completed.fetch_add(1, Ordering::Relaxed);
+                    continue;
+                }
+                // Wrong size — file is corrupted, delete and re-download
+                let _ = std::fs::remove_file(&dest);
+            }
         }
         if let Some(parent) = dest.parent() { std::fs::create_dir_all(parent)?; }
 
@@ -303,7 +311,7 @@ async fn download_assets(
         tasks.spawn(async move {
             let _permit = sem.acquire_owned().await.map_err(|e| WoxError::Internal(e.to_string()))?;
             let result = crate::services::downloader::download_file_with_events(
-                &app_handle, &url, dest, None, String::new(),
+                &app_handle, &url, dest, Some(&hash), String::new(),
             ).await;
             completed.fetch_add(1, Ordering::Relaxed);
             result
