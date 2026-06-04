@@ -66,6 +66,14 @@ export default function InstanceDetail() {
     fetchRuntimes();
   }, [id]);
 
+  // Auto-select Java runtime matching the instance
+  useEffect(() => {
+    if (instance && runtimes.length > 0 && editJava) {
+      const match = runtimes.find(r => r.path.includes(editJava) || r.version === editJava);
+      if (match) setEditJava(match.path);
+    }
+  }, [instance, runtimes]);
+
   // Auto-filter mods by instance game version
   useEffect(() => {
     if (instance) {
@@ -138,7 +146,24 @@ export default function InstanceDetail() {
                 <MenuItem key={l} value={l}>{t(`common.${l}`)}</MenuItem>
               ))}
             </TextField>
-            <TextField label="Java" value={editJava} onChange={(e) => setEditJava(e.target.value)} fullWidth />
+            <TextField
+              select
+              label={t("instance.java")}
+              value={editJava}
+              onChange={(e) => setEditJava(e.target.value)}
+              fullWidth
+            >
+              {runtimes.map((rt) => (
+                <MenuItem key={rt.id} value={rt.path}>
+                  {rt.vendor} {rt.version} ({rt.path})
+                </MenuItem>
+              ))}
+              {runtimes.length === 0 && (
+                <MenuItem disabled value="">
+                  {t("java.noRuntimes")}
+                </MenuItem>
+              )}
+            </TextField>
             <TextField label={t("instance.jvmArgs")} value={editJvmArgs} onChange={(e) => setEditJvmArgs(e.target.value)} fullWidth multiline />
             <Box sx={{ display: "flex", gap: 2 }}>
               <TextField label={t("instance.resolution") + " W"} value={editResW} onChange={(e) => setEditResW(Number(e.target.value))} type="number" sx={{ flex: 1 }} />
