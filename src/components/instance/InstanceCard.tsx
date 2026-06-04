@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, Typography, IconButton, Box, Chip } from "@mui/material";
+import { Card, CardContent, Typography, IconButton, Box, Chip, CircularProgress } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SettingsIcon from "@mui/icons-material/Settings";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -16,6 +17,7 @@ interface Props {
 export default function InstanceCard({ instance, onDelete }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [installing, setInstalling] = useState(false);
 
   return (
     <Card
@@ -38,13 +40,16 @@ export default function InstanceCard({ instance, onDelete }: Props) {
         {!instance.downloaded && (
           <IconButton onClick={async (e) => {
             e.stopPropagation();
+            setInstalling(true);
             try {
               await invoke("install_game_version", { version: instance.gameVersion });
-            } catch (err) {
-              // silently fail, download progress shows in overlay
+            } catch {
+              // download error shown in overlay
+            } finally {
+              setInstalling(false);
             }
-          }}>
-            <DownloadIcon />
+          }} disabled={installing}>
+            {installing ? <CircularProgress size={20} /> : <DownloadIcon />}
           </IconButton>
         )}
         <IconButton onClick={() => navigate(`/instances/${instance.id}`)}>

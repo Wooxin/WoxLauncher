@@ -15,7 +15,7 @@ export default function Instances() {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
-    fetchInstances();
+    if (instances.length === 0) fetchInstances();
   }, []);
 
   const handleCreate = async (config: InstanceConfig) => {

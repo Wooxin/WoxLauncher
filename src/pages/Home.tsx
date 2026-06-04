@@ -27,14 +27,18 @@ export default function Home() {
   const [selectedId, setSelectedId] = useState("");
   const [loginOpen, setLoginOpen] = useState(false);
   const [launchStatus, setLaunchStatus] = useState<'idle' | 'installing' | 'launching'>('idle');
-  const [pageLoading, setPageLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(instances.length === 0);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" | "info" }>({
     open: false, message: "", severity: "info"
   });
 
   useEffect(() => {
-    Promise.all([fetchInstances(), fetchAccounts(), fetchRuntimes()])
-      .finally(() => setPageLoading(false));
+    if (instances.length === 0) {
+      Promise.all([fetchInstances(), fetchAccounts(), fetchRuntimes()])
+        .finally(() => setPageLoading(false));
+    } else {
+      setPageLoading(false);
+    }
   }, []);
 
   const selected = instances.find(i => i.id === selectedId) || null;
