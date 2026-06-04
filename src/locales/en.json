@@ -81,7 +81,14 @@
     "password": "Password",
     "serverUrl": "Auth Server URL",
     "loginSuccess": "Logged in as {{name}}",
-    "loginFailed": "Login failed"
+    "loginFailed": "Login failed",
+    "copyCode": "Copy code",
+    "codeCopied": "Code copied!",
+    "openBrowserAgain": "Open browser again",
+    "expiresIn": "Expires in {{time}}",
+    "codeExpired": "Code expired. Please try again.",
+    "retry": "Retry",
+    "cancel": "Cancel"
   },
   "download": {
     "downloading": "Downloading",

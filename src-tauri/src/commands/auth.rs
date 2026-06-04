@@ -1,7 +1,7 @@
 use crate::app_state::AppState;
 use crate::error::WoxError;
 use crate::services::auth;
-use crate::services::auth::AuthResult;
+use crate::services::auth::{AuthResult, DeviceCodeData};
 use crate::services::account_store::{self, StoredAccount};
 use chrono::Utc;
 
@@ -21,7 +21,7 @@ fn save_account_from_result(result: &AuthResult, auth_mode: &str, auth_server_ur
 }
 
 #[tauri::command]
-pub async fn ms_device_code(state: tauri::State<'_, AppState>) -> Result<(String, String, String), WoxError> {
+pub async fn ms_device_code(state: tauri::State<'_, AppState>) -> Result<DeviceCodeData, WoxError> {
     auth::ms_device_code(&state.http).await.map_err(|e| WoxError::Network(e))
 }
 

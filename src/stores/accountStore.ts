@@ -9,7 +9,7 @@ interface AccountState {
   error: string | null;
   fetchAccounts: () => Promise<void>;
   loginOffline: (username: string) => Promise<void>;
-  startMicrosoftLogin: () => Promise<{ deviceCode: string; userCode: string; verificationUri: string }>;
+  startMicrosoftLogin: () => Promise<{ deviceCode: string; userCode: string; verificationUri: string; interval: number; expiresIn: number }>;
   pollMicrosoftToken: (deviceCode: string) => Promise<void>;
   loginAuthlib: (serverUrl: string, username: string, password: string) => Promise<void>;
   setActive: (uuid: string) => Promise<void>;
@@ -44,8 +44,14 @@ export const useAccountStore = create<AccountState>((set, get) => ({
   },
 
   startMicrosoftLogin: async () => {
-    const [deviceCode, userCode, verificationUri] = await invoke<[string, string, string]>("ms_device_code");
-    return { deviceCode, userCode, verificationUri };
+    const data = await invoke<{ deviceCode: string; userCode: string; verificationUri: string; interval: number; expiresIn: number }>("ms_device_code");
+    return {
+      deviceCode: data.deviceCode,
+      userCode: data.userCode,
+      verificationUri: data.verificationUri,
+      interval: data.interval,
+      expiresIn: data.expiresIn,
+    };
   },
 
   pollMicrosoftToken: async (deviceCode: string) => {

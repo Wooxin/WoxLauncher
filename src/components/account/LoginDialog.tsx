@@ -2,7 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, TextField, Tabs, Tab, Typography, Box, CircularProgress, Alert,
+  IconButton, Tooltip, Paper,
 } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import OpenInBrowserIcon from "@mui/icons-material/OpenInBrowser";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { useTranslation } from "react-i18next";
 import { useAccountStore } from "../../stores/accountStore";
 
@@ -21,7 +25,11 @@ export default function LoginDialog({ open, onClose }: Props) {
   const [msCode, setMsCode] = useState("");
   const [msUri, setMsUri] = useState("");
   const [polling, setPolling] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [remaining, setRemaining] = useState(0);
+  const [expired, setExpired] = useState(false);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (!open) {
@@ -32,30 +40,89 @@ export default function LoginDialog({ open, onClose }: Props) {
       setMsCode("");
       setMsUri("");
       setPolling(false);
+      setCopied(false);
+      setExpired(false);
+      setRemaining(0);
     }
   }, [open]);
 
   useEffect(() => {
-    return () => { if (pollingRef.current) clearInterval(pollingRef.current); };
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+      if (countdownRef.current) clearInterval(countdownRef.current);
+    };
   }, []);
 
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(msCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard not available
+    }
+  };
+
+  const handleCancelPolling = () => {
+    if (pollingRef.current) clearInterval(pollingRef.current);
+    if (countdownRef.current) clearInterval(countdownRef.current);
+    setPolling(false);
+    setMsCode("");
+    setMsUri("");
+    setExpired(false);
+    setRemaining(0);
+  };
+
   const handleMicrosoftLogin = async () => {
-    const { deviceCode, userCode, verificationUri } = await startMicrosoftLogin();
+    const { deviceCode, userCode, verificationUri, interval, expiresIn } = await startMicrosoftLogin();
     setMsCode(userCode);
     setMsUri(verificationUri);
     setPolling(true);
+    setExpired(false);
 
-    const interval = setInterval(async () => {
+    // Auto-open browser
+    try { await openUrl(verificationUri); } catch { /* ignore */ }
+
+    // Set expiry countdown
+    const expiry = Date.now() + expiresIn * 1000;
+
+    // Start countdown timer
+    const cd = setInterval(() => {
+      const left = Math.max(0, Math.floor((expiry - Date.now()) / 1000));
+      setRemaining(left);
+      if (left <= 0) {
+        setExpired(true);
+        clearInterval(cd);
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        setPolling(false);
+      }
+    }, 1000);
+    countdownRef.current = cd;
+
+    // Start polling
+    const pollInterval = setInterval(async () => {
       try {
         await pollMicrosoftToken(deviceCode);
-        clearInterval(interval);
+        clearInterval(pollInterval);
+        clearInterval(cd);
         setPolling(false);
         onClose();
       } catch {
-        // keep polling
+        // keep polling until expired
       }
-    }, 3000);
-    pollingRef.current = interval;
+    }, interval * 1000);
+    pollingRef.current = pollInterval;
+  };
+
+  const handleRetry = () => {
+    handleCancelPolling();
+    handleMicrosoftLogin();
+  };
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
   const handleOfflineLogin = async () => {
@@ -83,18 +150,54 @@ export default function LoginDialog({ open, onClose }: Props) {
 
         {tab === 0 && (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-            {!polling ? (
+            {!polling && !expired ? (
               <Button variant="contained" onClick={handleMicrosoftLogin}>
                 {t("account.microsoft")} {t("account.login")}
               </Button>
+            ) : expired ? (
+              <Box sx={{ textAlign: "center" }}>
+                <Alert severity="warning" sx={{ mb: 2 }}>{t("account.codeExpired")}</Alert>
+                <Button variant="contained" onClick={handleRetry}>
+                  {t("account.retry")}
+                </Button>
+              </Box>
             ) : (
               <Box sx={{ textAlign: "center" }}>
-                <Typography variant="h6" sx={{ mb: 1 }}>{t("account.userCode", { code: msCode })}</Typography>
-                <Typography color="text.secondary" sx={{ mb: 2 }}>
-                  {t("account.openBrowser", { url: msUri })}
+                <Paper variant="outlined" sx={{ p: 2, mb: 2, display: "inline-block" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: "center" }}>
+                    <Typography variant="h5" sx={{ fontFamily: "monospace", letterSpacing: 4 }}>
+                      {msCode}
+                    </Typography>
+                    <Tooltip title={copied ? t("account.codeCopied") : t("account.copyCode")}>
+                      <IconButton onClick={handleCopyCode} size="small">
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </Paper>
+
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 1, mb: 2 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {t("account.openBrowser", { url: msUri })}
+                  </Typography>
+                  <Tooltip title={t("account.openBrowserAgain") ?? ""}>
+                    <IconButton size="small" onClick={() => openUrl(msUri).catch(() => {})}>
+                      <OpenInBrowserIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+
+                <CircularProgress size={24} sx={{ mb: 1 }} />
+                <Typography variant="body2" sx={{ mb: 1 }}>{t("account.polling")}</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {t("account.expiresIn", { time: formatTime(remaining) })}
                 </Typography>
-                <CircularProgress />
-                <Typography variant="body2" sx={{ mt: 1 }}>{t("account.polling")}</Typography>
+
+                <Box sx={{ mt: 2 }}>
+                  <Button variant="outlined" color="warning" size="small" onClick={handleCancelPolling}>
+                    {t("account.cancel")}
+                  </Button>
+                </Box>
               </Box>
             )}
           </Box>

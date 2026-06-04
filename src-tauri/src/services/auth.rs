@@ -18,16 +18,23 @@ pub struct AuthResult {
     pub token_type: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeviceCodeData {
+    pub device_code: String,
+    pub user_code: String,
+    pub verification_uri: String,
+    pub interval: u64,
+    pub expires_in: u64,
+}
+
 #[derive(Deserialize)]
 struct DeviceCodeResponse {
     device_code: String,
     user_code: String,
     verification_uri: String,
-    #[allow(dead_code)]
     message: String,
-    #[allow(dead_code)]
     interval: u64,
-    #[allow(dead_code)]
     expires_in: u64,
 }
 
@@ -75,7 +82,7 @@ struct McProfileResponse {
 }
 
 /// Step 1: Get device code for user to authorize
-pub async fn ms_device_code(client: &Client) -> Result<(String, String, String), String> {
+pub async fn ms_device_code(client: &Client) -> Result<DeviceCodeData, String> {
     let resp = client
         .post(MS_DEVICE_CODE_URL)
         .form(&[
@@ -89,7 +96,13 @@ pub async fn ms_device_code(client: &Client) -> Result<(String, String, String),
         .await
         .map_err(|e| e.to_string())?;
 
-    Ok((resp.device_code, resp.user_code, resp.verification_uri))
+    Ok(DeviceCodeData {
+        device_code: resp.device_code,
+        user_code: resp.user_code,
+        verification_uri: resp.verification_uri,
+        interval: resp.interval,
+        expires_in: resp.expires_in,
+    })
 }
 
 /// Step 2: Poll for token (call repeatedly until success or timeout)
