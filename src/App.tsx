@@ -3,6 +3,7 @@ import SidebarLayout from "./layouts/SidebarLayout";
 import Home from "./pages/Home";
 import Instances from "./pages/Instances";
 import InstanceDetail from "./pages/InstanceDetail";
+import Accounts from "./pages/Accounts";
 import ModBrowser from "./pages/ModBrowser";
 import ModDetail from "./pages/ModDetail";
 import JavaManager from "./pages/JavaManager";
@@ -14,6 +15,7 @@ function App() {
       <Route element={<SidebarLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/instances" element={<Instances />} />
+        <Route path="/accounts" element={<Accounts />} />
         <Route path="/instances/:id" element={<InstanceDetail />} />
         <Route path="/mods" element={<ModBrowser />} />
         <Route path="/mods/:id" element={<ModDetail />} />

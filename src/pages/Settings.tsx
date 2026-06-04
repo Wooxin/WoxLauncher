@@ -15,6 +15,7 @@ export default function Settings() {
     theme, setTheme, keepOpen, setKeepOpen,
     downloadMirror, setDownloadMirror, maxDownloadThreads, setMaxDownloadThreads,
     defaultJvmArgs, setDefaultJvmArgs, maxMemoryGb, setMaxMemoryGb,
+    autoMemory, setAutoMemory,
   } = useSettingsStore();
 
   return (
@@ -112,12 +113,19 @@ export default function Settings() {
             <RocketLaunchIcon color="primary" />
             <Typography variant="h6">{t("settings.launch")}</Typography>
           </Box>
+          <List>
+            <ListItem disablePadding sx={{ mb: 2 }}>
+              <ListItemText primary={t("settings.autoMemory")} secondary={t("settings.autoMemoryDesc")} />
+              <Switch checked={autoMemory} onChange={(e) => setAutoMemory(e.target.checked)} />
+            </ListItem>
+          </List>
           <TextField
             label={t("settings.defaultJvmArgs")}
             value={defaultJvmArgs}
             onChange={(e) => setDefaultJvmArgs(e.target.value)}
             fullWidth multiline rows={2} size="small"
             sx={{ mb: 2 }}
+            disabled={autoMemory}
           />
           <TextField
             label={t("settings.maxMemory")}
@@ -125,6 +133,7 @@ export default function Settings() {
             value={maxMemoryGb}
             onChange={(e) => setMaxMemoryGb(Number(e.target.value))}
             fullWidth size="small"
+            disabled={autoMemory}
             slotProps={{ input: { endAdornment: <InputAdornment position="end">GB</InputAdornment> } }}
           />
         </CardContent>
