@@ -12,6 +12,10 @@ pub fn run() {
             commands::instance::delete_instance,
             commands::instance::get_instance,
             commands::instance::update_instance,
+            commands::auth::ms_device_code,
+            commands::auth::ms_poll_token,
+            commands::auth::offline_auth,
+            commands::auth::authlib_login,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
