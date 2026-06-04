@@ -34,6 +34,7 @@ pub fn run() {
             commands::java::detect_java,
             commands::minecraft::fetch_version_manifest,
             commands::download::start_download,
+            commands::java_download::download_java,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

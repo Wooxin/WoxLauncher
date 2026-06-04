@@ -5,3 +5,4 @@ pub mod downloader;
 pub mod launcher;
 pub mod java_manager;
 pub mod preflight;
+pub mod java_download;
