@@ -91,10 +91,17 @@ pub async fn ms_device_code(client: &Client) -> Result<DeviceCodeData, String> {
         ])
         .send()
         .await
-        .map_err(|e| e.to_string())?
-        .json::<DeviceCodeResponse>()
+        .map_err(|e| format!("Network error: {}", e))?;
+
+    if !resp.status().is_success() {
+        let body = resp.text().await.unwrap_or_default();
+        return Err(format!("Microsoft login failed ({}): {}", resp.status(), body));
+    }
+
+    let resp: DeviceCodeResponse = resp
+        .json()
         .await
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| format!("Invalid response: {}", e))?;
 
     Ok(DeviceCodeData {
         device_code: resp.device_code,
