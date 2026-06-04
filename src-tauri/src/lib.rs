@@ -17,6 +17,7 @@ pub fn run() {
             commands::auth::offline_auth,
             commands::auth::authlib_login,
             commands::launch::launch_game,
+            commands::java::detect_java,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
