@@ -2,12 +2,13 @@ import { memo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Drawer, List, ListItemButton, ListItemIcon, ListItemText,
-  Typography, Box, Tooltip,
+  Typography, Box, Tooltip, Divider,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import FolderIcon from "@mui/icons-material/Folder";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
+import GrassIcon from "@mui/icons-material/Grid3x3";
 import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
@@ -24,8 +25,14 @@ export default memo(function Sidebar({ width, collapsed }: SidebarProps) {
     { path: "/", label: t("nav.home"), icon: <HomeIcon /> },
     { path: "/instances", label: t("nav.instances"), icon: <FolderIcon /> },
     { path: "/accounts", label: t("nav.accounts"), icon: <PersonIcon /> },
+  ];
+
+  const bottomItems = [
     { path: "/settings", label: t("nav.settings"), icon: <SettingsIcon /> },
   ];
+
+  const isActive = (path: string) =>
+    path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
 
   return (
     <Drawer
@@ -33,48 +40,84 @@ export default memo(function Sidebar({ width, collapsed }: SidebarProps) {
       sx={{
         width,
         flexShrink: 0,
-        transition: "width 0.15s ease",
         "& .MuiDrawer-paper": {
           width,
           boxSizing: "border-box",
-          bgcolor: "background.paper",
-          borderRight: "1px solid",
-          borderColor: "divider",
-          transition: "width 0.15s ease",
+          bgcolor: "#1E1E1E",
+          borderRight: "1px solid #333",
           overflowX: "hidden",
+          display: "flex",
+          flexDirection: "column",
         },
       }}
     >
-      <Box sx={{ p: 2, pt: 3, display: "flex", alignItems: "center", gap: 1 }}>
+      {/* Logo */}
+      <Box sx={{ p: 2, pt: 3, pb: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
+        <GrassIcon sx={{ color: "primary.main", fontSize: 28 }} />
         {!collapsed && (
-          <Typography variant="h5" sx={{ fontWeight: 700, flex: 1 }} color="primary.main">
+          <Typography variant="h6" sx={{ fontWeight: 800, color: "primary.main", letterSpacing: 0.5 }}>
             {t("app.title")}
           </Typography>
         )}
       </Box>
-      <List>
+
+      <Divider sx={{ borderColor: "#333", mx: 1 }} />
+
+      {/* Main nav */}
+      <List sx={{ flex: 1, pt: 1 }}>
         {navItems.map((item) => {
           const btn = (
             <ListItemButton
               key={item.path}
-              selected={location.pathname === item.path || (item.path !== "/" && location.pathname.startsWith(item.path))}
+              selected={isActive(item.path)}
               onClick={() => navigate(item.path)}
-              sx={{ mx: 1, borderRadius: 2, mb: 0.5, justifyContent: collapsed ? "center" : "flex-start" }}
+              sx={{
+                mx: 0.5, borderRadius: 1, mb: 0.5,
+                justifyContent: collapsed ? "center" : "flex-start",
+                minHeight: 44,
+              }}
             >
-              <ListItemIcon sx={{ minWidth: collapsed ? 0 : 40, justifyContent: "center" }}>
+              <ListItemIcon sx={{
+                minWidth: collapsed ? 0 : 40,
+                justifyContent: "center",
+                color: isActive(item.path) ? "primary.main" : "text.secondary",
+              }}>
                 {item.icon}
               </ListItemIcon>
               {!collapsed && <ListItemText primary={item.label} />}
             </ListItemButton>
           );
+          if (collapsed) return <Tooltip key={item.path} title={item.label || ""} placement="right">{btn}</Tooltip>;
+          return <Box key={item.path}>{btn}</Box>;
+        })}
+      </List>
 
-          if (collapsed) {
-            return (
-              <Tooltip key={item.path} title={item.label || ""} placement="right">
-                {btn}
-              </Tooltip>
-            );
-          }
+      {/* Bottom nav */}
+      <Divider sx={{ borderColor: "#333", mx: 1 }} />
+      <List sx={{ pb: 1 }}>
+        {bottomItems.map((item) => {
+          const btn = (
+            <ListItemButton
+              key={item.path}
+              selected={isActive(item.path)}
+              onClick={() => navigate(item.path)}
+              sx={{
+                mx: 0.5, borderRadius: 1, mb: 0.5,
+                justifyContent: collapsed ? "center" : "flex-start",
+                minHeight: 44,
+              }}
+            >
+              <ListItemIcon sx={{
+                minWidth: collapsed ? 0 : 40,
+                justifyContent: "center",
+                color: isActive(item.path) ? "primary.main" : "text.secondary",
+              }}>
+                {item.icon}
+              </ListItemIcon>
+              {!collapsed && <ListItemText primary={item.label} />}
+            </ListItemButton>
+          );
+          if (collapsed) return <Tooltip key={item.path} title={item.label || ""} placement="right">{btn}</Tooltip>;
           return <Box key={item.path}>{btn}</Box>;
         })}
       </List>
