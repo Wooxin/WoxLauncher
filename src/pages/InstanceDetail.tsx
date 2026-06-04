@@ -86,13 +86,6 @@ export default function InstanceDetail() {
     }
   }, [instance, runtimes]);
 
-  // Auto-filter mods by instance game version
-  useEffect(() => {
-    if (instance) {
-      setModQuery(instance.gameVersion.split('.').slice(0, 2).join('.'));
-    }
-  }, [instance?.gameVersion]);
-
   const handleSave = async () => {
     if (!instance) return;
     const updated: InstanceConfig = {
