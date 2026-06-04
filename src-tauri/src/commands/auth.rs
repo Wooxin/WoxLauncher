@@ -1,7 +1,7 @@
 use crate::app_state::AppState;
 use crate::error::WoxError;
 use crate::services::auth;
-use crate::services::auth::{AuthResult, DeviceCodeData};
+use crate::services::auth::AuthResult;
 use crate::services::account_store::{self, StoredAccount};
 use chrono::Utc;
 
@@ -20,14 +20,22 @@ fn save_account_from_result(result: &AuthResult, auth_mode: &str, auth_server_ur
     }
 }
 
+/// Microsoft OAuth PKCE login — starts local server, opens browser, waits for callback, completes auth
 #[tauri::command]
-pub async fn ms_device_code(state: tauri::State<'_, AppState>) -> Result<DeviceCodeData, WoxError> {
-    auth::ms_device_code(&state.http).await.map_err(|e| WoxError::Network(e))
-}
+pub async fn ms_login(
+    state: tauri::State<'_, AppState>,
+    app_handle: tauri::AppHandle,
+) -> Result<AuthResult, WoxError> {
+    let (listener, auth_url, verifier, redirect_uri) = auth::ms_login_start().await
+        .map_err(|e| WoxError::Auth(e))?;
 
-#[tauri::command]
-pub async fn ms_poll_token(state: tauri::State<'_, AppState>, device_code: String) -> Result<AuthResult, WoxError> {
-    let result = auth::ms_poll_token(&state.http, &device_code).await.map_err(|e| WoxError::Network(e))?;
+    // Open browser
+    let _ = tauri_plugin_opener::open_url(app_handle, auth_url, None::<&str>);
+
+    // Wait for callback + complete auth
+    let result = auth::ms_login_complete(&state.http, listener, &verifier, &redirect_uri).await
+        .map_err(|e| WoxError::Auth(e))?;
+
     save_account_from_result(&result, "msa", None);
     Ok(result)
 }

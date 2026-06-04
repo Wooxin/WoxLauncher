@@ -1,9 +1,11 @@
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
+use tokio::net::TcpListener;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 const MS_CLIENT_ID: &str = "00000000402b5328";
-const MS_DEVICE_CODE_URL: &str = "https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode";
-const MS_TOKEN_URL: &str = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
+const MS_AUTH_URL: &str = "https://login.live.com/oauth20_authorize.srf";
+const MS_TOKEN_URL: &str = "https://login.live.com/oauth20_token.srf";
 const MS_XBL_AUTH_URL: &str = "https://user.auth.xboxlive.com/user/authenticate";
 const MS_XSTS_AUTH_URL: &str = "https://xsts.auth.xboxlive.com/xsts/authorize";
 const MC_LOGIN_URL: &str = "https://api.minecraftservices.com/authentication/login_with_xbox";
@@ -18,31 +20,12 @@ pub struct AuthResult {
     pub token_type: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DeviceCodeData {
-    pub device_code: String,
-    pub user_code: String,
-    pub verification_uri: String,
-    pub interval: u64,
-    pub expires_in: u64,
-}
-
-#[derive(Deserialize)]
-struct DeviceCodeResponse {
-    device_code: String,
-    user_code: String,
-    verification_uri: String,
-    message: String,
-    interval: u64,
-    expires_in: u64,
-}
-
 #[derive(Deserialize)]
 struct TokenResponse {
     access_token: String,
     #[allow(dead_code)]
     token_type: String,
+    refresh_token: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -81,13 +64,119 @@ struct McProfileResponse {
     id: String,
 }
 
-/// Step 1: Get device code for user to authorize
-pub async fn ms_device_code(client: &Client) -> Result<DeviceCodeData, String> {
+/// Generate PKCE code verifier and challenge
+fn generate_pkce() -> (String, String) {
+    use rand::Rng;
+    let mut rng = rand::thread_rng();
+    let bytes: Vec<u8> = (0..64).map(|_| rng.gen()).collect();
+    let verifier = base64_url(&bytes);
+
+    use sha2::{Digest, Sha256};
+    let mut hasher = Sha256::new();
+    hasher.update(verifier.as_bytes());
+    let hash = hasher.finalize();
+    let challenge = base64_url(&hash);
+    (verifier, challenge)
+}
+
+fn base64_url(bytes: &[u8]) -> String {
+    use base64::Engine;
+    base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(bytes)
+}
+
+/// Microsoft OAuth PKCE login — starts local server, returns auth URL. Caller opens browser, then calls complete.
+pub async fn ms_login_start() -> Result<(TcpListener, String, String, String), String> {
+    let listener = TcpListener::bind("127.0.0.1:0").await
+        .map_err(|e| format!("Failed to start local server: {}", e))?;
+    let port = listener.local_addr().map_err(|e| e.to_string())?.port();
+    let redirect_uri = format!("http://127.0.0.1:{}", port);
+
+    let (verifier, challenge) = generate_pkce();
+
+    let auth_url = format!(
+        "{}?client_id={}&response_type=code&redirect_uri={}&scope={}&code_challenge={}&code_challenge_method=S256",
+        MS_AUTH_URL,
+        MS_CLIENT_ID,
+        urlencoding(&redirect_uri),
+        urlencoding("XboxLive.signin offline_access"),
+        challenge
+    );
+
+    Ok((listener, auth_url, verifier, redirect_uri))
+}
+
+/// Complete the OAuth PKCE flow after browser callback
+pub async fn ms_login_complete(
+    client: &Client,
+    listener: TcpListener,
+    verifier: &str,
+    redirect_uri: &str,
+) -> Result<AuthResult, String> {
+    let code = wait_for_callback(listener).await?;
+    let token = exchange_code(client, &code, verifier, redirect_uri).await?;
+    do_minecraft_auth(client, &token.access_token).await
+}
+
+fn urlencoding(s: &str) -> String {
+    let mut result = String::new();
+    for b in s.as_bytes() {
+        match *b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => result.push(*b as char),
+            b' ' => result.push_str("%20"),
+            b':' => result.push_str("%3A"),
+            b'/' => result.push_str("%2F"),
+            _ => result.push_str(&format!("%{:02X}", b)),
+        }
+    }
+    result
+}
+
+/// Wait for browser redirect on local server
+async fn wait_for_callback(listener: TcpListener) -> Result<String, String> {
+    let (mut stream, _) = tokio::time::timeout(
+        std::time::Duration::from_secs(300),
+        listener.accept()
+    ).await
+        .map_err(|_| "Login timed out. Please try again.".to_string())?
+        .map_err(|e| format!("Failed to accept connection: {}", e))?;
+
+    let mut buf = [0u8; 4096];
+    let n = stream.read(&mut buf).await.map_err(|e| e.to_string())?;
+    let request = String::from_utf8_lossy(&buf[..n]);
+
+    // Parse the GET /?code=xxx from HTTP request
+    let code = request
+        .lines()
+        .next()
+        .and_then(|line| {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() >= 2 { Some(parts[1].to_string()) } else { None }
+        })
+        .and_then(|path| {
+            path.split("?code=").nth(1)
+                .map(|c| c.split('&').next().unwrap_or(c).to_string())
+        })
+        .ok_or("No authorization code received. Please try again.".to_string())?;
+
+    // Send success response to browser
+    let response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>Login successful!</h1><p>You can close this window now.</p></body></html>";
+    let _ = stream.write_all(response.as_bytes()).await;
+    let _ = stream.shutdown().await;
+
+    Ok(code)
+}
+
+/// Exchange authorization code for access token
+async fn exchange_code(client: &Client, code: &str, verifier: &str, redirect_uri: &str) -> Result<TokenResponse, String> {
     let resp = client
-        .post(MS_DEVICE_CODE_URL)
+        .post(MS_TOKEN_URL)
         .form(&[
             ("client_id", MS_CLIENT_ID),
-            ("scope", "XboxLive.signoff offline_access"),
+            ("code", code),
+            ("grant_type", "authorization_code"),
+            ("code_verifier", verifier),
+            ("redirect_uri", redirect_uri),
+            ("scope", "XboxLive.signin offline_access"),
         ])
         .send()
         .await
@@ -96,39 +185,14 @@ pub async fn ms_device_code(client: &Client) -> Result<DeviceCodeData, String> {
     if !resp.status().is_success() {
         let status = resp.status();
         let body = resp.text().await.unwrap_or_default();
-        return Err(format!("Microsoft login failed ({}): {}", status, body));
+        return Err(format!("Token exchange failed ({}): {}", status, body));
     }
 
-    let resp: DeviceCodeResponse = resp
-        .json()
-        .await
-        .map_err(|e| format!("Invalid response: {}", e))?;
-
-    Ok(DeviceCodeData {
-        device_code: resp.device_code,
-        user_code: resp.user_code,
-        verification_uri: resp.verification_uri,
-        interval: resp.interval,
-        expires_in: resp.expires_in,
-    })
+    resp.json().await.map_err(|e| format!("Invalid response: {}", e))
 }
 
-/// Step 2: Poll for token (call repeatedly until success or timeout)
-pub async fn ms_poll_token(client: &Client, device_code: &str) -> Result<AuthResult, String> {
-    let token = client
-        .post(MS_TOKEN_URL)
-        .form(&[
-            ("client_id", MS_CLIENT_ID),
-            ("grant_type", "urn:ietf:params:oauth:grant-type:device_code"),
-            ("device_code", device_code),
-        ])
-        .send()
-        .await
-        .map_err(|e| e.to_string())?
-        .json::<TokenResponse>()
-        .await
-        .map_err(|e| e.to_string())?;
-
+/// Xbox Live → XSTS → Minecraft authentication chain
+async fn do_minecraft_auth(client: &Client, ms_token: &str) -> Result<AuthResult, String> {
     // Xbox Live auth
     let xbl = client
         .post(MS_XBL_AUTH_URL)
@@ -136,17 +200,13 @@ pub async fn ms_poll_token(client: &Client, device_code: &str) -> Result<AuthRes
             "Properties": {
                 "AuthMethod": "RPS",
                 "SiteName": "user.auth.xboxlive.com",
-                "RpsTicket": format!("d={}", token.access_token),
+                "RpsTicket": format!("d={}", ms_token),
             },
             "RelyingParty": "http://auth.xboxlive.com",
             "TokenType": "JWT",
         }))
-        .send()
-        .await
-        .map_err(|e| e.to_string())?
-        .json::<XblAuthResponse>()
-        .await
-        .map_err(|e| e.to_string())?;
+        .send().await.map_err(|e| format!("XBL error: {}", e))?
+        .json::<XblAuthResponse>().await.map_err(|e| format!("XBL error: {}", e))?;
 
     // XSTS auth
     let xsts = client
@@ -159,12 +219,8 @@ pub async fn ms_poll_token(client: &Client, device_code: &str) -> Result<AuthRes
             "RelyingParty": "rp://api.minecraftservices.com/",
             "TokenType": "JWT",
         }))
-        .send()
-        .await
-        .map_err(|e| e.to_string())?
-        .json::<XstsResponse>()
-        .await
-        .map_err(|e| e.to_string())?;
+        .send().await.map_err(|e| format!("XSTS error: {}", e))?
+        .json::<XstsResponse>().await.map_err(|e| format!("XSTS error: {}", e))?;
 
     let uhs = &xsts.display_claims.xui[0].uhs;
 
@@ -174,23 +230,15 @@ pub async fn ms_poll_token(client: &Client, device_code: &str) -> Result<AuthRes
         .json(&McLoginRequest {
             identity_token: format!("XBL3.0 x={};{}", uhs, xsts.token),
         })
-        .send()
-        .await
-        .map_err(|e| e.to_string())?
-        .json::<TokenResponse>()
-        .await
-        .map_err(|e| e.to_string())?;
+        .send().await.map_err(|e| format!("Minecraft auth error: {}", e))?
+        .json::<TokenResponse>().await.map_err(|e| format!("Minecraft auth error: {}", e))?;
 
     // Minecraft profile
     let profile = client
         .get(MC_PROFILE_URL)
         .bearer_auth(&mc.access_token)
-        .send()
-        .await
-        .map_err(|e| e.to_string())?
-        .json::<McProfileResponse>()
-        .await
-        .map_err(|e| e.to_string())?;
+        .send().await.map_err(|e| format!("Profile error: {}", e))?
+        .json::<McProfileResponse>().await.map_err(|e| format!("Profile error: {}", e))?;
 
     Ok(AuthResult {
         username: profile.name,
