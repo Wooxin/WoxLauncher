@@ -24,13 +24,12 @@ fn save_account_from_result(result: &AuthResult, auth_mode: &str, auth_server_ur
 #[tauri::command]
 pub async fn ms_login(
     state: tauri::State<'_, AppState>,
-    app_handle: tauri::AppHandle,
 ) -> Result<AuthResult, WoxError> {
     let (listener, auth_url, verifier, redirect_uri) = auth::ms_login_start().await
         .map_err(|e| WoxError::Auth(e))?;
 
     // Open browser
-    let _ = tauri_plugin_opener::open_url(app_handle, auth_url, None::<&str>);
+    let _ = tauri_plugin_opener::open_url(auth_url, None::<&str>);
 
     // Wait for callback + complete auth
     let result = auth::ms_login_complete(&state.http, listener, &verifier, &redirect_uri).await
