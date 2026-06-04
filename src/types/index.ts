@@ -14,7 +14,13 @@ export interface InstanceConfig {
   lastPlayedAt: string | null;
 }
 
-export type LoaderType = "vanilla" | "fabric" | "forge" | "quilt";
+export type LoaderType = "vanilla" | "fabric" | "forge" | "quilt" | "neoforge" | "liteloader" | "rift" | "optifine";
+
+export interface MinecraftVersion {
+  id: string;
+  versionType: string;
+  releaseTime: string;
+}
 
 // Java
 export type JavaVendor = "zulu" | "oracle" | "adoptium" | "graalvm";

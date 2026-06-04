@@ -1,15 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  MenuItem,
+  Dialog, DialogTitle, DialogContent, DialogActions,
+  TextField, Button, MenuItem, Autocomplete, Chip,
 } from "@mui/material";
+import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
-import type { InstanceConfig, LoaderType } from "../../types";
+import type { InstanceConfig, LoaderType, MinecraftVersion } from "../../types";
 
 interface Props {
   open: boolean;
@@ -17,17 +13,33 @@ interface Props {
   onSubmit: (config: InstanceConfig) => void;
 }
 
+const ALL_LOADERS: LoaderType[] = [
+  "vanilla", "fabric", "forge", "quilt", "neoforge", "liteloader", "rift", "optifine",
+];
+
 export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props) {
   const { t } = useTranslation();
   const [name, setName] = useState("");
-  const [gameVersion, setGameVersion] = useState("1.21");
+  const [gameVersion, setGameVersion] = useState<MinecraftVersion | null>(null);
   const [loaderType, setLoaderType] = useState<LoaderType>("vanilla");
+  const [versions, setVersions] = useState<MinecraftVersion[]>([]);
+  const [versionsLoading, setVersionsLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setVersionsLoading(true);
+      invoke<MinecraftVersion[]>("fetch_version_manifest")
+        .then(setVersions)
+        .catch(() => setVersions([]))
+        .finally(() => setVersionsLoading(false));
+    }
+  }, [open]);
 
   const handleSubmit = () => {
     onSubmit({
       id: "",
       name,
-      gameVersion,
+      gameVersion: gameVersion?.id || "1.21",
       loaderType,
       loaderVersion: "",
       javaVersion: "17",
@@ -39,6 +51,8 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
       lastPlayedAt: null,
     });
     setName("");
+    setGameVersion(null);
+    setLoaderType("vanilla");
     onClose();
   };
 
@@ -54,12 +68,32 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <TextField
-          label={t("instance.gameVersion")}
-          fullWidth
-          margin="dense"
+        <Autocomplete
           value={gameVersion}
-          onChange={(e) => setGameVersion(e.target.value)}
+          onChange={(_, v) => setGameVersion(v)}
+          options={versions}
+          getOptionLabel={(opt) => opt.id}
+          loading={versionsLoading}
+          renderOption={(props, opt) => (
+            <li {...props} key={opt.id}>
+              <span>{opt.id}</span>
+              <Chip
+                label={opt.versionType}
+                size="small"
+                sx={{ ml: 1 }}
+                color={opt.versionType === "release" ? "success" : "warning"}
+              />
+            </li>
+          )}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t("instance.gameVersion")}
+              margin="dense"
+            />
+          )}
+          slotProps={{ paper: { sx: { mt: 1 } } }}
+          sx={{ mt: 1 }}
         />
         <TextField
           select
@@ -69,10 +103,11 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
           value={loaderType}
           onChange={(e) => setLoaderType(e.target.value as LoaderType)}
         >
-          <MenuItem value="vanilla">{t("common.vanilla")}</MenuItem>
-          <MenuItem value="fabric">{t("common.fabric")}</MenuItem>
-          <MenuItem value="forge">{t("common.forge")} ({t("mod.comingSoon")})</MenuItem>
-          <MenuItem value="quilt">{t("common.quilt")} ({t("mod.comingSoon")})</MenuItem>
+          {ALL_LOADERS.map((loader) => (
+            <MenuItem key={loader} value={loader}>
+              {t(`common.${loader}`)}
+            </MenuItem>
+          ))}
         </TextField>
       </DialogContent>
       <DialogActions>

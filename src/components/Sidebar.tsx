@@ -10,8 +10,6 @@ import {
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import FolderIcon from "@mui/icons-material/Folder";
-import ExtensionIcon from "@mui/icons-material/Extension";
-import CoffeeIcon from "@mui/icons-material/Coffee";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useTranslation } from "react-i18next";
 
@@ -27,8 +25,6 @@ export default function Sidebar({ width }: SidebarProps) {
   const navItems = [
     { path: "/", label: t("nav.home"), icon: <HomeIcon /> },
     { path: "/instances", label: t("nav.instances"), icon: <FolderIcon /> },
-    { path: "/mods", label: t("nav.modBrowser"), icon: <ExtensionIcon /> },
-    { path: "/java", label: t("nav.java"), icon: <CoffeeIcon /> },
     { path: "/settings", label: t("nav.settings"), icon: <SettingsIcon /> },
   ];
 
