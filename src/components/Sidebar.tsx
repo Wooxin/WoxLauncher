@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Drawer, List, ListItemButton, ListItemIcon, ListItemText,
@@ -5,8 +6,6 @@ import {
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import FolderIcon from "@mui/icons-material/Folder";
-import ExtensionIcon from "@mui/icons-material/Extension";
-import CoffeeIcon from "@mui/icons-material/Coffee";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
 import { useTranslation } from "react-i18next";
@@ -16,7 +15,7 @@ interface SidebarProps {
   collapsed: boolean;
 }
 
-export default function Sidebar({ width, collapsed }: SidebarProps) {
+export default memo(function Sidebar({ width, collapsed }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -25,8 +24,6 @@ export default function Sidebar({ width, collapsed }: SidebarProps) {
     { path: "/", label: t("nav.home"), icon: <HomeIcon /> },
     { path: "/instances", label: t("nav.instances"), icon: <FolderIcon /> },
     { path: "/accounts", label: t("nav.accounts"), icon: <PersonIcon /> },
-    { path: "/mods", label: t("nav.modBrowser"), icon: <ExtensionIcon /> },
-    { path: "/java", label: t("nav.java"), icon: <CoffeeIcon /> },
     { path: "/settings", label: t("nav.settings"), icon: <SettingsIcon /> },
   ];
 
@@ -36,14 +33,14 @@ export default function Sidebar({ width, collapsed }: SidebarProps) {
       sx={{
         width,
         flexShrink: 0,
-        transition: "width 0.2s ease",
+        transition: "width 0.15s ease",
         "& .MuiDrawer-paper": {
           width,
           boxSizing: "border-box",
           bgcolor: "background.paper",
           borderRight: "1px solid",
           borderColor: "divider",
-          transition: "width 0.2s ease",
+          transition: "width 0.15s ease",
           overflowX: "hidden",
         },
       }}
@@ -60,9 +57,9 @@ export default function Sidebar({ width, collapsed }: SidebarProps) {
           const btn = (
             <ListItemButton
               key={item.path}
-              selected={location.pathname === item.path}
+              selected={location.pathname === item.path || (item.path !== "/" && location.pathname.startsWith(item.path))}
               onClick={() => navigate(item.path)}
-              sx={{ mx: collapsed ? 1 : 1, borderRadius: 2, mb: 0.5, justifyContent: collapsed ? "center" : "flex-start" }}
+              sx={{ mx: 1, borderRadius: 2, mb: 0.5, justifyContent: collapsed ? "center" : "flex-start" }}
             >
               <ListItemIcon sx={{ minWidth: collapsed ? 0 : 40, justifyContent: "center" }}>
                 {item.icon}
@@ -83,4 +80,4 @@ export default function Sidebar({ width, collapsed }: SidebarProps) {
       </List>
     </Drawer>
   );
-}
+});

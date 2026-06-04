@@ -25,7 +25,9 @@ pub fn run() {
             let quit = MenuItemBuilder::with_id("quit", "Quit").build(app)?;
             let menu = MenuBuilder::new(app).item(&show).item(&quit).build()?;
 
+            let icon = app.default_window_icon().cloned().unwrap();
             let _tray = TrayIconBuilder::new()
+                .icon(icon)
                 .tooltip("WoxLauncher")
                 .menu(&menu)
                 .on_menu_event(move |app, event| {
