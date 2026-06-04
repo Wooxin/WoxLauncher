@@ -13,6 +13,9 @@ pub fn launch_game(
     let instance_dir = paths::instance_dir(&instance.id);
     let game_dir = instance_dir.join("game");
 
+    // Ensure directories exist
+    std::fs::create_dir_all(&game_dir).map_err(|e| WoxError::Filesystem(format!("Cannot create game directory: {}", e)))?;
+
     // Build classpath from libraries
     let libraries_dir = paths::libraries_dir();
     let versions_dir = paths::versions_dir();
