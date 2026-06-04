@@ -43,8 +43,8 @@ export default function InstanceCard({ instance, onDelete }: Props) {
             setInstalling(true);
             try {
               await invoke("install_game_version", { version: instance.gameVersion });
-            } catch {
-              // download error shown in overlay
+            } catch (e) {
+              alert(typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e));
             } finally {
               setInstalling(false);
             }
