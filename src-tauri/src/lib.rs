@@ -16,6 +16,7 @@ pub fn run() {
             commands::auth::ms_poll_token,
             commands::auth::offline_auth,
             commands::auth::authlib_login,
+            commands::launch::launch_game,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
