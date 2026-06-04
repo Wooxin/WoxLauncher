@@ -163,62 +163,103 @@ async fn download_libraries(
     libraries: &[Library],
 ) -> Result<(), WoxError> {
     let os_name = current_os_name();
+    let mut tasks = tokio::task::JoinSet::new();
+    let max_concurrent: usize = 4;
 
-    for lib in libraries {
-        // Check rules
+    for lib in libraries.iter() {
         if !is_library_allowed(&lib.rules) {
             continue;
         }
 
-        // Handle native libraries
-        if let Some(ref natives) = lib.natives {
+        // Skip already-downloaded libraries early
+        let already_exists = if let Some(ref natives) = lib.natives {
             if let Some(classifier) = natives.get(os_name) {
-                if let Some(ref downloads) = lib.downloads {
-                    if let Some(ref classifiers) = downloads.classifiers {
-                        if let Some(native_info) = classifiers.get(classifier) {
-                            let dest = get_native_path(&lib.name, classifier);
-                            if dest.exists() {
-                                continue;
-                            }
-                            if let Some(parent) = dest.parent() {
-                                std::fs::create_dir_all(parent)?;
-                            }
-                            crate::services::downloader::download_file_with_events(
-                                app_handle,
-                                &native_info.url,
-                                dest,
-                                Some(&native_info.sha1),
-                                format!("Native {}", lib.name),
-                            )
-                            .await?;
-                        }
-                    }
-                }
-                continue; // Native handled, skip artifact download
+                let dest = get_native_path(&lib.name, classifier);
+                dest.exists()
+            } else {
+                false
             }
-        }
-
-        // Download main artifact
-        if let Some(ref downloads) = lib.downloads {
+        } else if let Some(ref downloads) = lib.downloads {
             if let Some(ref artifact) = downloads.artifact {
                 let dest = get_maven_path(&lib.name);
-                if dest.exists() {
-                    continue;
+                dest.exists()
+            } else {
+                false
+            }
+        } else {
+            false
+        };
+        if already_exists {
+            continue;
+        }
+
+        let lib = lib.clone();
+        let os_name = os_name.to_string();
+        let app_handle = app_handle.clone();
+
+        tasks.spawn(async move {
+            // Handle native libraries
+            if let Some(ref natives) = lib.natives {
+                if let Some(classifier) = natives.get(&os_name) {
+                    if let Some(ref downloads) = lib.downloads {
+                        if let Some(ref classifiers) = downloads.classifiers {
+                            if let Some(native_info) = classifiers.get(classifier) {
+                                let dest = get_native_path(&lib.name, classifier);
+                                if !dest.exists() {
+                                    if let Some(parent) = dest.parent() {
+                                        let _ = std::fs::create_dir_all(parent);
+                                    }
+                                    crate::services::downloader::download_file_with_events(
+                                        &app_handle,
+                                        &native_info.url,
+                                        dest,
+                                        Some(&native_info.sha1),
+                                        format!("Native {}", lib.name),
+                                    )
+                                    .await?;
+                                }
+                            }
+                        }
+                    }
+                    return Ok::<_, WoxError>(());
                 }
-                if let Some(parent) = dest.parent() {
-                    std::fs::create_dir_all(parent)?;
+            }
+
+            // Download main artifact
+            if let Some(ref downloads) = lib.downloads {
+                if let Some(ref artifact) = downloads.artifact {
+                    let dest = get_maven_path(&lib.name);
+                    if !dest.exists() {
+                        if let Some(parent) = dest.parent() {
+                            let _ = std::fs::create_dir_all(parent);
+                        }
+                        crate::services::downloader::download_file_with_events(
+                            &app_handle,
+                            &artifact.url,
+                            dest,
+                            Some(&artifact.sha1),
+                            format!("Library {}", lib.name),
+                        )
+                        .await?;
+                    }
                 }
-                crate::services::downloader::download_file_with_events(
-                    app_handle,
-                    &artifact.url,
-                    dest,
-                    Some(&artifact.sha1),
-                    format!("Library {}", lib.name),
-                )
-                .await?;
+            }
+            Ok::<_, WoxError>(())
+        });
+
+        // Limit concurrency
+        if tasks.len() >= max_concurrent {
+            while let Some(result) = tasks.join_next().await {
+                result.map_err(|e| WoxError::Internal(e.to_string()))??;
             }
         }
     }
+
+    // Drain remaining tasks
+    while let Some(result) = tasks.join_next().await {
+        result.map_err(|e| WoxError::Internal(e.to_string()))??;
+    }
+
     Ok(())
 }
 
@@ -258,31 +299,50 @@ async fn download_assets(
 
     let objects_dir = paths::assets_dir().join("objects");
     let base_url = "https://resources.download.minecraft.net";
-    let mut downloaded = 0;
+    let mut tasks = tokio::task::JoinSet::new();
+    let max_concurrent: usize = 4;
+    let mut downloaded = 0usize;
     let total = index.objects.len();
 
     for (_key, obj) in &index.objects {
-        let hash = &obj.hash;
-        let first2 = &hash[..2];
+        let hash = obj.hash.clone();
+        let first2 = hash[..2].to_string();
         let sub_path = format!("{}/{}", first2, hash);
         let dest = objects_dir.join(&sub_path);
 
-        if !dest.exists() {
-            if let Some(parent) = dest.parent() {
-                std::fs::create_dir_all(parent)?;
-            }
-            let url = format!("{}/{}", base_url, sub_path);
-            crate::services::downloader::download_file_with_events(
-                app_handle,
-                &url,
-                dest,
-                None,
-                format!("Assets ({}/{})", downloaded + 1, total),
-            )
-            .await?;
+        if dest.exists() {
+            downloaded += 1;
+            continue;
         }
+
+        if let Some(parent) = dest.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+
+        let url = format!("{}/{}", base_url, sub_path);
+        let app_handle = app_handle.clone();
         downloaded += 1;
+        let label = format!("Assets ({}/{})", downloaded, total);
+
+        tasks.spawn(async move {
+            crate::services::downloader::download_file_with_events(
+                &app_handle, &url, dest, None, label,
+            )
+            .await
+        });
+
+        if tasks.len() >= max_concurrent {
+            while let Some(result) = tasks.join_next().await {
+                result.map_err(|e| WoxError::Internal(e.to_string()))??;
+            }
+        }
     }
+
+    // Drain remaining tasks
+    while let Some(result) = tasks.join_next().await {
+        result.map_err(|e| WoxError::Internal(e.to_string()))??;
+    }
+
     Ok(())
 }
 
