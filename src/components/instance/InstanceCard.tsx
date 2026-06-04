@@ -2,7 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent, Typography, IconButton, Box, Chip } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SettingsIcon from "@mui/icons-material/Settings";
+import DownloadIcon from "@mui/icons-material/Download";
 import { useTranslation } from "react-i18next";
+import { invoke } from "@tauri-apps/api/core";
 import { LOADER_KEYS } from "../../constants";
 import type { InstanceConfig } from "../../types";
 
@@ -33,6 +35,16 @@ export default function InstanceCard({ instance, onDelete }: Props) {
         </Box>
       </CardContent>
       <Box sx={{ pr: 1 }} onClick={(e) => e.stopPropagation()}>
+        <IconButton onClick={async (e) => {
+          e.stopPropagation();
+          try {
+            await invoke("install_game_version", { version: instance.gameVersion });
+          } catch (err) {
+            // silently fail, download progress shows in overlay
+          }
+        }}>
+          <DownloadIcon />
+        </IconButton>
         <IconButton onClick={() => navigate(`/instances/${instance.id}`)}>
           <SettingsIcon />
         </IconButton>

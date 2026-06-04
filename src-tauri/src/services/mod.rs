@@ -6,3 +6,4 @@ pub mod launcher;
 pub mod java_manager;
 pub mod preflight;
 pub mod java_download;
+pub mod game_installer;

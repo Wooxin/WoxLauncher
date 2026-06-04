@@ -96,7 +96,8 @@
     "done": "Done",
     "error": "Error",
     "speed": "{{speed}}",
-    "active": "Downloads ({{count}} active)"
+    "active": "Downloads ({{count}} active)",
+    "installingVersion": "Installing Minecraft {{version}}..."
   },
   "launch": {
     "preparing": "Preparing game assets...",

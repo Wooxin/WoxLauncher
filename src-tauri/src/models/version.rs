@@ -21,6 +21,7 @@ pub struct VersionJson {
     #[serde(rename = "assetIndex")]
     pub asset_index: AssetIndexInfo,
     pub assets: String,
+    pub downloads: Option<VersionDownloads>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -61,6 +62,14 @@ pub struct Rule {
 pub struct OsRule {
     pub name: Option<String>,
     pub arch: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct VersionDownloads {
+    pub client: Option<DownloadInfo>,
+    #[serde(rename = "client_mappings")]
+    pub client_mappings: Option<DownloadInfo>,
+    pub server: Option<DownloadInfo>,
 }
 
 #[derive(Debug, Clone, Deserialize)]

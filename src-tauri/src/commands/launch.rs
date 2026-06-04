@@ -25,10 +25,13 @@ pub async fn launch_game(
         token_type: account.auth_mode,
     };
 
-    // 4. Spawn game
+    // 4. Ensure all game files are downloaded
+    crate::services::game_installer::install_version(&app_handle, &instance.game_version).await?;
+
+    // 5. Spawn game
     let pid = launcher::launch_game(&instance, &auth_result, &java_path)?;
 
-    // 5. Update last_played_at
+    // 6. Update last_played_at
     let mut updated = instance.clone();
     updated.last_played_at = Some(chrono::Utc::now());
     crate::services::instance_manager::update_instance(updated)?;

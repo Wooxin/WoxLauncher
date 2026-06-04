@@ -6,3 +6,4 @@ pub mod java;
 pub mod minecraft;
 pub mod download;
 pub mod java_download;
+pub mod game_installer;

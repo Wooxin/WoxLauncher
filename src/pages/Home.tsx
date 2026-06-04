@@ -23,6 +23,7 @@ export default function Home() {
   const { runtimes, fetchRuntimes } = useJavaStore();
   const [selectedId, setSelectedId] = useState("");
   const [loginOpen, setLoginOpen] = useState(false);
+  const [launchStatus, setLaunchStatus] = useState<'idle' | 'installing' | 'launching'>('idle');
 
   useEffect(() => {
     fetchInstances();
@@ -40,13 +41,19 @@ export default function Home() {
     }
     const javaPath = runtimes.length > 0 ? runtimes[0].path : "java";
     try {
+      setLaunchStatus('installing');
+      await invoke("install_game_version", { version: selected.gameVersion });
+
+      setLaunchStatus('launching');
       await invoke("launch_game", {
         instance: selected,
         accountUuid: activeAccount.uuid,
         javaPath,
       });
+      setLaunchStatus('idle');
       alert(t("launch.launched"));
     } catch (e) {
+      setLaunchStatus('idle');
       alert(String(e));
     }
   };
@@ -102,12 +109,14 @@ export default function Home() {
               <Button
                 variant="contained"
                 size="large"
-                startIcon={<PlayArrowIcon />}
+                startIcon={launchStatus !== 'idle' ? <CircularProgress size={20} /> : <PlayArrowIcon />}
                 onClick={handleLaunch}
-                disabled={!selectedId}
+                disabled={!selectedId || launchStatus !== 'idle'}
                 sx={{ mt: 1 }}
               >
-                {t("instance.launch")}
+                {launchStatus === 'installing' ? t("download.installingVersion", { version: selected?.gameVersion ?? "" }) :
+                 launchStatus === 'launching' ? t("launch.starting") :
+                 t("instance.launch")}
               </Button>
             </CardContent>
           </Card>
