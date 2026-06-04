@@ -10,6 +10,7 @@ const MC_LOGIN_URL: &str = "https://api.minecraftservices.com/authentication/log
 const MC_PROFILE_URL: &str = "https://api.minecraftservices.com/minecraft/profile";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AuthResult {
     pub username: String,
     pub uuid: String,

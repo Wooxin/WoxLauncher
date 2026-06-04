@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
 pub enum JavaVendor {
     Zulu,
     Oracle,
@@ -9,6 +10,7 @@ pub enum JavaVendor {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct JavaRuntime {
     pub id: String,
     pub vendor: JavaVendor,
