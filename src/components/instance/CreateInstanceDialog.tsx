@@ -5,6 +5,7 @@ import {
 } from "@mui/material";
 import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
+import { ALL_LOADERS } from "../../constants";
 import type { InstanceConfig, LoaderType, MinecraftVersion } from "../../types";
 
 interface Props {
@@ -12,10 +13,6 @@ interface Props {
   onClose: () => void;
   onSubmit: (config: InstanceConfig) => void;
 }
-
-const ALL_LOADERS: LoaderType[] = [
-  "vanilla", "fabric", "forge", "quilt", "neoforge", "liteloader", "rift", "optifine",
-];
 
 export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props) {
   const { t } = useTranslation();

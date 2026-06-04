@@ -3,12 +3,8 @@ import { Card, CardContent, Typography, IconButton, Box, Chip } from "@mui/mater
 import DeleteIcon from "@mui/icons-material/Delete";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useTranslation } from "react-i18next";
+import { LOADER_KEYS } from "../../constants";
 import type { InstanceConfig } from "../../types";
-
-const LOADER_KEYS: Record<string, string> = {
-  vanilla: "common.vanilla", fabric: "common.fabric", forge: "common.forge", quilt: "common.quilt",
-  neoforge: "common.neoforge", liteloader: "common.liteloader", rift: "common.rift", optifine: "common.optifine",
-};
 
 interface Props {
   instance: InstanceConfig;

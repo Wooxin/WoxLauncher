@@ -8,14 +8,11 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import SaveIcon from "@mui/icons-material/Save";
 import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
+import { ALL_LOADERS } from "../constants";
 import { useJavaStore } from "../stores/javaStore";
 import { useModSearch } from "../hooks/useModSearch";
 import ModCard from "../components/mod/ModCard";
 import type { InstanceConfig, LoaderType } from "../types";
-
-const ALL_LOADERS: LoaderType[] = [
-  "vanilla", "fabric", "forge", "quilt", "neoforge", "liteloader", "rift", "optifine",
-];
 
 interface TabPanelProps {
   children?: React.ReactNode;

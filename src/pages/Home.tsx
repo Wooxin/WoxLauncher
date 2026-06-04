@@ -11,15 +11,9 @@ import { invoke } from "@tauri-apps/api/core";
 import { useInstanceStore } from "../stores/instanceStore";
 import { useAccountStore } from "../stores/accountStore";
 import { useJavaStore } from "../stores/javaStore";
+import { LOADER_KEYS } from "../constants";
 import AccountPicker from "../components/account/AccountPicker";
 import LoginDialog from "../components/account/LoginDialog";
-
-const LOADER_KEYS: Record<string, string> = {
-  vanilla: "common.vanilla", fabric: "common.fabric",
-  forge: "common.forge", quilt: "common.quilt",
-  neoforge: "common.neoforge", liteloader: "common.liteloader",
-  rift: "common.rift", optifine: "common.optifine",
-};
 
 export default function Home() {
   const { t } = useTranslation();
