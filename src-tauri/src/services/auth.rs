@@ -75,8 +75,7 @@ struct McProfileResponse {
 }
 
 /// Step 1: Get device code for user to authorize
-pub async fn ms_device_code() -> Result<(String, String, String), String> {
-    let client = Client::new();
+pub async fn ms_device_code(client: &Client) -> Result<(String, String, String), String> {
     let resp = client
         .post(MS_DEVICE_CODE_URL)
         .form(&[
@@ -94,9 +93,7 @@ pub async fn ms_device_code() -> Result<(String, String, String), String> {
 }
 
 /// Step 2: Poll for token (call repeatedly until success or timeout)
-pub async fn ms_poll_token(device_code: &str) -> Result<AuthResult, String> {
-    let client = Client::new();
-
+pub async fn ms_poll_token(client: &Client, device_code: &str) -> Result<AuthResult, String> {
     let token = client
         .post(MS_TOKEN_URL)
         .form(&[
@@ -182,7 +179,7 @@ pub async fn ms_poll_token(device_code: &str) -> Result<AuthResult, String> {
     })
 }
 
-/// Offline mode — generate UUID from username
+/// Offline mode -- generate UUID from username
 pub fn offline_auth(username: &str) -> AuthResult {
     use sha2::{Digest, Sha256};
     let mut hasher = Sha256::new();
@@ -205,11 +202,11 @@ pub fn offline_auth(username: &str) -> AuthResult {
 
 /// AuthLib-Injector login
 pub async fn authlib_login(
+    client: &Client,
     server_url: &str,
     username: &str,
     password: &str,
 ) -> Result<AuthResult, String> {
-    let client = Client::new();
     let resp = client
         .post(format!("{}/authserver/authenticate", server_url))
         .json(&serde_json::json!({

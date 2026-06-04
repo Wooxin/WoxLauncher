@@ -1,60 +1,34 @@
 use crate::models::instance::InstanceConfig;
 use crate::services::auth::AuthResult;
+use crate::error::WoxError;
+use crate::utils::paths;
 use std::path::PathBuf;
 use std::process::Command;
-
-fn get_wox_dir() -> PathBuf {
-    #[cfg(target_os = "windows")]
-    {
-        std::env::var("APPDATA")
-            .map(PathBuf::from)
-            .unwrap_or_else(|_| PathBuf::from("."))
-    }
-    #[cfg(target_os = "macos")]
-    {
-        std::env::var("HOME")
-            .map(|h| PathBuf::from(h).join("Library/Application Support"))
-            .unwrap_or_else(|_| PathBuf::from("."))
-    }
-    #[cfg(target_os = "linux")]
-    {
-        std::env::var("XDG_DATA_HOME")
-            .map(PathBuf::from)
-            .or_else(|_| {
-                std::env::var("HOME")
-                    .map(|h| PathBuf::from(h).join(".local/share"))
-            })
-            .unwrap_or_else(|_| PathBuf::from("."))
-    }
-}
 
 pub fn launch_game(
     instance: &InstanceConfig,
     auth: &AuthResult,
     java_path: &str,
-) -> Result<u32, String> {
-    let wox_dir = get_wox_dir().join(".woxlauncher");
-    let shared_dir = wox_dir.join("shared");
-    let instance_dir = wox_dir.join("instances").join(&instance.id);
+) -> Result<u32, WoxError> {
+    let instance_dir = paths::instance_dir(&instance.id);
     let game_dir = instance_dir.join("game");
 
     // Build classpath from libraries
-    let libraries_dir = shared_dir.join("libraries");
-    let versions_dir = shared_dir.join("versions");
+    let libraries_dir = paths::libraries_dir();
+    let versions_dir = paths::versions_dir();
 
     // Read version JSON to get args and libraries
     let version_json_path =
         versions_dir.join(&instance.game_version).join(format!("{}.json", instance.game_version));
     if !version_json_path.exists() {
-        return Err(format!(
+        return Err(WoxError::NotFound(format!(
             "Game version {} is not downloaded. Please download it first.",
             instance.game_version
-        ));
+        )));
     }
 
     let version_json: serde_json::Value =
-        serde_json::from_str(&std::fs::read_to_string(&version_json_path).map_err(|e| e.to_string())?)
-            .map_err(|e| e.to_string())?;
+        serde_json::from_str(&std::fs::read_to_string(&version_json_path)?)?;
 
     // Build classpath
     let mut classpath = Vec::new();
@@ -89,7 +63,7 @@ pub fn launch_game(
 
     // Replace placeholders
     let classpath_separator = if cfg!(target_os = "windows") { ";" } else { ":" };
-    let natives_dir = shared_dir
+    let natives_dir = paths::shared_dir()
         .join("versions")
         .join(&instance.game_version)
         .join("natives");
@@ -141,7 +115,7 @@ pub fn launch_game(
                 .replace("${game_directory}", &game_dir.to_string_lossy())
                 .replace(
                     "${assets_root}",
-                    &shared_dir.join("assets").to_string_lossy(),
+                    &paths::assets_dir().to_string_lossy(),
                 )
                 .replace("${assets_index_name}", &instance.game_version)
                 .replace("${auth_xuid}", "")
@@ -165,7 +139,7 @@ pub fn launch_game(
     cmd.current_dir(&instance_dir);
 
     // Detach process
-    let child = cmd.spawn().map_err(|e| format!("Failed to launch: {}", e))?;
+    let child = cmd.spawn().map_err(|e| WoxError::Launch(format!("Failed to launch: {}", e)))?;
     let pid = child.id();
 
     Ok(pid)

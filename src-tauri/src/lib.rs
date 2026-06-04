@@ -1,11 +1,21 @@
 mod models;
 mod services;
 mod commands;
+mod utils;
+mod error;
+mod app_state;
+mod events;
+
+use app_state::AppState;
+use utils::requests;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .manage(AppState {
+            http: requests::http_client().clone(),
+        })
         .invoke_handler(tauri::generate_handler![
             commands::instance::list_instances,
             commands::instance::create_instance,

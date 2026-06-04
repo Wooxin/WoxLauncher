@@ -1,41 +1,14 @@
 use crate::models::java::{JavaRuntime, JavaVendor};
+use crate::error::WoxError;
+use crate::utils::paths;
 use std::path::PathBuf;
 
-fn get_wox_dir() -> PathBuf {
-    #[cfg(target_os = "windows")]
-    {
-        std::env::var("APPDATA")
-            .map(PathBuf::from)
-            .unwrap_or_else(|_| PathBuf::from("."))
-    }
-    #[cfg(target_os = "macos")]
-    {
-        std::env::var("HOME")
-            .map(|h| PathBuf::from(h).join("Library/Application Support"))
-            .unwrap_or_else(|_| PathBuf::from("."))
-    }
-    #[cfg(target_os = "linux")]
-    {
-        std::env::var("XDG_DATA_HOME")
-            .map(PathBuf::from)
-            .or_else(|_| {
-                std::env::var("HOME")
-                    .map(|h| PathBuf::from(h).join(".local/share"))
-            })
-            .unwrap_or_else(|_| PathBuf::from("."))
-    }
-}
-
-fn java_dir() -> PathBuf {
-    get_wox_dir().join(".woxlauncher").join("java")
-}
-
 /// Detect installed Java runtimes (both system and managed)
-pub fn detect_installed() -> Result<Vec<JavaRuntime>, String> {
+pub fn detect_installed() -> Result<Vec<JavaRuntime>, WoxError> {
     let mut runtimes = Vec::new();
 
     // Check managed Java dir
-    let managed = java_dir();
+    let managed = paths::java_dir();
     if managed.exists() {
         if let Ok(entries) = std::fs::read_dir(&managed) {
             for entry in entries.flatten() {
@@ -106,8 +79,7 @@ pub fn detect_installed() -> Result<Vec<JavaRuntime>, String> {
 }
 
 fn detect_java_version(java_path: &str) -> String {
-    if let Ok(output) = std::process::Command::new(java_path).arg("-version").output()
-    {
+    if let Ok(output) = std::process::Command::new(java_path).arg("-version").output() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         for part in stderr.split('"') {
             if part.contains('.') && part.chars().any(|c| c.is_ascii_digit()) {

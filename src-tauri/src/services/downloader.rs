@@ -1,5 +1,6 @@
+use crate::error::WoxError;
 use crate::models::download::{DownloadProgress, DownloadStatus};
-use reqwest::Client;
+use crate::utils::requests;
 use std::path::PathBuf;
 use tokio::io::AsyncWriteExt;
 
@@ -8,14 +9,13 @@ pub async fn download_file(
     dest: PathBuf,
     sha1: Option<&str>,
     on_progress: impl Fn(DownloadProgress) + Send + 'static,
-) -> Result<(), String> {
+) -> Result<(), WoxError> {
     if let Some(parent) = dest.parent() {
-        tokio::fs::create_dir_all(parent)
-            .await
-            .map_err(|e| e.to_string())?;
+        tokio::fs::create_dir_all(parent).await?;
     }
 
-    let client = Client::new();
+    let client = requests::http_client();
+
     let mut request = client.get(url);
 
     // Resume support: if partial file exists
@@ -27,7 +27,7 @@ pub async fn download_file(
         }
     }
 
-    let response = request.send().await.map_err(|e| e.to_string())?;
+    let response = request.send().await?;
     let total = response.content_length().unwrap_or(0) + downloaded;
     let start_time = std::time::Instant::now();
 
@@ -35,20 +35,17 @@ pub async fn download_file(
         tokio::fs::OpenOptions::new()
             .append(true)
             .open(&dest)
-            .await
-            .map_err(|e| e.to_string())?
+            .await?
     } else {
-        tokio::fs::File::create(&dest)
-            .await
-            .map_err(|e| e.to_string())?
+        tokio::fs::File::create(&dest).await?
     };
 
     let mut stream = response.bytes_stream();
     use futures_util::StreamExt;
 
     while let Some(chunk) = stream.next().await {
-        let chunk = chunk.map_err(|e| e.to_string())?;
-        file.write_all(&chunk).await.map_err(|e| e.to_string())?;
+        let chunk = chunk?;
+        file.write_all(&chunk).await?;
         downloaded += chunk.len() as u64;
 
         let elapsed = start_time.elapsed().as_secs_f64();
@@ -93,14 +90,17 @@ pub async fn download_file(
                 .to_string(),
         });
 
-        let file_bytes = tokio::fs::read(&dest).await.map_err(|e| e.to_string())?;
+        let file_bytes = tokio::fs::read(&dest).await?;
         use sha1::Digest;
         let mut hasher = sha1::Sha1::new();
         hasher.update(&file_bytes);
         let actual = format!("{:x}", hasher.finalize());
 
         if actual != expected_sha1 {
-            return Err(format!("SHA1 mismatch: expected {}, got {}", expected_sha1, actual));
+            return Err(WoxError::Validation(format!(
+                "SHA1 mismatch: expected {}, got {}",
+                expected_sha1, actual
+            )));
         }
     }
 
