@@ -1,0 +1,121 @@
+use crate::models::download::{DownloadProgress, DownloadStatus};
+use reqwest::Client;
+use std::path::PathBuf;
+use tokio::io::AsyncWriteExt;
+
+pub async fn download_file(
+    url: &str,
+    dest: PathBuf,
+    sha1: Option<&str>,
+    on_progress: impl Fn(DownloadProgress) + Send + 'static,
+) -> Result<(), String> {
+    if let Some(parent) = dest.parent() {
+        tokio::fs::create_dir_all(parent)
+            .await
+            .map_err(|e| e.to_string())?;
+    }
+
+    let client = Client::new();
+    let mut request = client.get(url);
+
+    // Resume support: if partial file exists
+    let mut downloaded: u64 = 0;
+    if let Ok(meta) = tokio::fs::metadata(&dest).await {
+        downloaded = meta.len();
+        if downloaded > 0 {
+            request = request.header("Range", format!("bytes={}-", downloaded));
+        }
+    }
+
+    let response = request.send().await.map_err(|e| e.to_string())?;
+    let total = response.content_length().unwrap_or(0) + downloaded;
+    let start_time = std::time::Instant::now();
+
+    let mut file = if downloaded > 0 {
+        tokio::fs::OpenOptions::new()
+            .append(true)
+            .open(&dest)
+            .await
+            .map_err(|e| e.to_string())?
+    } else {
+        tokio::fs::File::create(&dest)
+            .await
+            .map_err(|e| e.to_string())?
+    };
+
+    let mut stream = response.bytes_stream();
+    use futures_util::StreamExt;
+
+    while let Some(chunk) = stream.next().await {
+        let chunk = chunk.map_err(|e| e.to_string())?;
+        file.write_all(&chunk).await.map_err(|e| e.to_string())?;
+        downloaded += chunk.len() as u64;
+
+        let elapsed = start_time.elapsed().as_secs_f64();
+        let speed = if elapsed > 0.0 {
+            format!("{:.1} MB/s", (downloaded as f64 / 1048576.0) / elapsed)
+        } else {
+            "calculating...".to_string()
+        };
+
+        let percent = if total > 0 {
+            (downloaded as f64 / total as f64) * 100.0
+        } else {
+            0.0
+        };
+
+        on_progress(DownloadProgress {
+            downloaded,
+            total,
+            percent,
+            speed,
+            status: DownloadStatus::Downloading,
+            file_name: dest
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string(),
+        });
+    }
+
+    // SHA1 verification if provided
+    if let Some(expected_sha1) = sha1 {
+        on_progress(DownloadProgress {
+            downloaded,
+            total,
+            percent: 100.0,
+            speed: "Verifying...".to_string(),
+            status: DownloadStatus::Verifying,
+            file_name: dest
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string(),
+        });
+
+        let file_bytes = tokio::fs::read(&dest).await.map_err(|e| e.to_string())?;
+        use sha1::Digest;
+        let mut hasher = sha1::Sha1::new();
+        hasher.update(&file_bytes);
+        let actual = format!("{:x}", hasher.finalize());
+
+        if actual != expected_sha1 {
+            return Err(format!("SHA1 mismatch: expected {}, got {}", expected_sha1, actual));
+        }
+    }
+
+    on_progress(DownloadProgress {
+        downloaded,
+        total,
+        percent: 100.0,
+        speed: "Done".to_string(),
+        status: DownloadStatus::Done,
+        file_name: dest
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string(),
+    });
+
+    Ok(())
+}
