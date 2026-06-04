@@ -58,6 +58,25 @@
     "builtWith": "Built with",
     "builtWithValue": "Tauri 2 + React 19 + MUI"
   },
+  "account": {
+    "title": "Account",
+    "addAccount": "Add Account",
+    "switchAccount": "Switch Account",
+    "notLoggedIn": "Not logged in",
+    "login": "Login",
+    "logout": "Logout",
+    "microsoft": "Microsoft",
+    "offline": "Offline",
+    "authlib": "AuthLib Injector",
+    "userCode": "Code: {{code}}",
+    "openBrowser": "Open browser to {{url}} and enter the code",
+    "polling": "Waiting for authentication...",
+    "username": "Username",
+    "password": "Password",
+    "serverUrl": "Auth Server URL",
+    "loginSuccess": "Logged in as {{name}}",
+    "loginFailed": "Login failed"
+  },
   "common": {
     "vanilla": "Vanilla",
     "fabric": "Fabric",

@@ -54,6 +54,16 @@ export interface AccountInfo {
   authServerUrl?: string;
 }
 
+export interface StoredAccount {
+  username: string;
+  uuid: string;
+  accessToken: string;
+  authMode: "microsoft" | "offline" | "authlib";
+  authServerUrl?: string;
+  refreshToken?: string;
+  lastUsedAt: string;
+}
+
 // Mod
 export type ModSource = "modrinth" | "curseforge" | "mcmod";
 

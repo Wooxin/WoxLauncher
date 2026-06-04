@@ -8,6 +8,9 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import AddIcon from "@mui/icons-material/Add";
 import { useTranslation } from "react-i18next";
 import { useInstanceStore } from "../stores/instanceStore";
+import { useAccountStore } from "../stores/accountStore";
+import AccountPicker from "../components/account/AccountPicker";
+import LoginDialog from "../components/account/LoginDialog";
 
 const LOADER_KEYS: Record<string, string> = {
   vanilla: "common.vanilla", fabric: "common.fabric",
@@ -20,7 +23,9 @@ export default function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { instances, loading, fetchInstances } = useInstanceStore();
+  const { activeAccount } = useAccountStore();
   const [selectedId, setSelectedId] = useState("");
+  const [loginOpen, setLoginOpen] = useState(false);
 
   useEffect(() => { fetchInstances(); }, []);
 
@@ -28,16 +33,22 @@ export default function Home() {
 
   const handleLaunch = () => {
     if (!selected) return;
+    if (!activeAccount) {
+      setLoginOpen(true);
+      return;
+    }
     navigate(`/instances/${selected.id}`);
   };
 
   if (loading) return <CircularProgress />;
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "70vh", gap: 3 }}>
-      <Typography variant="h3" sx={{ fontWeight: 700 }}>
-        {t("app.title")}
-      </Typography>
+    <Box>
+      <AccountPicker />
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "70vh", gap: 3 }}>
+        <Typography variant="h3" sx={{ fontWeight: 700 }}>
+          {t("app.title")}
+        </Typography>
 
       {instances.length === 0 ? (
         <Card sx={{ maxWidth: 500, width: "100%", textAlign: "center", p: 3 }}>
@@ -91,6 +102,8 @@ export default function Home() {
           </Card>
         </>
       )}
+      </Box>
+      <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
     </Box>
   );
 }
