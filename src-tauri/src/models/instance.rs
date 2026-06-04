@@ -29,6 +29,8 @@ pub struct InstanceConfig {
     pub resolution_height: u32,
     pub created_at: DateTime<Utc>,
     pub last_played_at: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub downloaded: bool,
 }
 
 impl Default for InstanceConfig {
@@ -46,6 +48,7 @@ impl Default for InstanceConfig {
             resolution_height: 1080,
             created_at: Utc::now(),
             last_played_at: None,
+            downloaded: false,
         }
     }
 }

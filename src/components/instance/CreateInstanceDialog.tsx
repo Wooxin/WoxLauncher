@@ -83,6 +83,7 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
       resolutionHeight: 1080,
       createdAt: new Date().toISOString(),
       lastPlayedAt: null,
+      downloaded: false,
     });
     setName("");
     setGameVersion(null);

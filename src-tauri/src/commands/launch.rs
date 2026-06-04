@@ -28,6 +28,13 @@ pub async fn launch_game(
     // 4. Ensure all game files are downloaded
     crate::services::game_installer::install_version(&app_handle, &instance.game_version).await?;
 
+    // Mark instance as downloaded
+    {
+        let mut downloaded_instance = instance.clone();
+        downloaded_instance.downloaded = true;
+        crate::services::instance_manager::update_instance(downloaded_instance)?;
+    }
+
     // 5. Spawn game
     let pid = launcher::launch_game(&instance, &auth_result, &java_path)?;
 

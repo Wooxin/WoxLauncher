@@ -164,7 +164,6 @@ async fn download_libraries(
 ) -> Result<(), WoxError> {
     let os_name = current_os_name();
     let mut tasks = tokio::task::JoinSet::new();
-    let max_concurrent: usize = 4;
 
     for lib in libraries.iter() {
         if !is_library_allowed(&lib.rules) {
@@ -214,7 +213,7 @@ async fn download_libraries(
                                         &native_info.url,
                                         dest,
                                         Some(&native_info.sha1),
-                                        format!("Native {}", lib.name),
+                                        format!("Native {}", lib.name.split(':').last().unwrap_or(&lib.name)),
                                     )
                                     .await?;
                                 }
@@ -238,7 +237,7 @@ async fn download_libraries(
                             &artifact.url,
                             dest,
                             Some(&artifact.sha1),
-                            format!("Library {}", lib.name),
+                            format!("Library {}", lib.name.split(':').last().unwrap_or(&lib.name)),
                         )
                         .await?;
                     }
@@ -246,13 +245,6 @@ async fn download_libraries(
             }
             Ok::<_, WoxError>(())
         });
-
-        // Limit concurrency
-        if tasks.len() >= max_concurrent {
-            while let Some(result) = tasks.join_next().await {
-                result.map_err(|e| WoxError::Internal(e.to_string()))??;
-            }
-        }
     }
 
     // Drain remaining tasks
@@ -300,7 +292,6 @@ async fn download_assets(
     let objects_dir = paths::assets_dir().join("objects");
     let base_url = "https://resources.download.minecraft.net";
     let mut tasks = tokio::task::JoinSet::new();
-    let max_concurrent: usize = 4;
     let mut downloaded = 0usize;
     let total = index.objects.len();
 
@@ -322,7 +313,7 @@ async fn download_assets(
         let url = format!("{}/{}", base_url, sub_path);
         let app_handle = app_handle.clone();
         downloaded += 1;
-        let label = format!("Assets ({}/{})", downloaded, total);
+        let label = format!("Asset {}/{}", downloaded, total);
 
         tasks.spawn(async move {
             crate::services::downloader::download_file_with_events(
@@ -330,12 +321,6 @@ async fn download_assets(
             )
             .await
         });
-
-        if tasks.len() >= max_concurrent {
-            while let Some(result) = tasks.join_next().await {
-                result.map_err(|e| WoxError::Internal(e.to_string()))??;
-            }
-        }
     }
 
     // Drain remaining tasks

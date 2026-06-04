@@ -64,6 +64,13 @@ export default function InstanceDetail() {
     fetchRuntimes();
   }, [id]);
 
+  // Auto-filter mods by instance game version
+  useEffect(() => {
+    if (instance) {
+      setModQuery(instance.gameVersion.split('.').slice(0, 2).join('.'));
+    }
+  }, [instance?.gameVersion]);
+
   const handleSave = async () => {
     if (!instance) return;
     const updated: InstanceConfig = {
@@ -149,6 +156,7 @@ export default function InstanceDetail() {
           value={modQuery}
           onChange={(e) => setModQuery(e.target.value)}
           sx={{ mb: 2 }}
+          helperText={instance ? `Filtered by Minecraft ${instance.gameVersion}` : ""}
         />
         {modResults?.map((mod) => (
           <ModCard key={`${mod.source}-${mod.id}`} mod={mod} />

@@ -12,6 +12,7 @@ export interface InstanceConfig {
   resolutionHeight: number;
   createdAt: string;
   lastPlayedAt: string | null;
+  downloaded: boolean;
 }
 
 export type LoaderType = "vanilla" | "fabric" | "forge" | "quilt" | "neoforge" | "liteloader" | "rift" | "optifine";

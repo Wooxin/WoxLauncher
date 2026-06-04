@@ -35,16 +35,18 @@ export default function InstanceCard({ instance, onDelete }: Props) {
         </Box>
       </CardContent>
       <Box sx={{ pr: 1 }} onClick={(e) => e.stopPropagation()}>
-        <IconButton onClick={async (e) => {
-          e.stopPropagation();
-          try {
-            await invoke("install_game_version", { version: instance.gameVersion });
-          } catch (err) {
-            // silently fail, download progress shows in overlay
-          }
-        }}>
-          <DownloadIcon />
-        </IconButton>
+        {!instance.downloaded && (
+          <IconButton onClick={async (e) => {
+            e.stopPropagation();
+            try {
+              await invoke("install_game_version", { version: instance.gameVersion });
+            } catch (err) {
+              // silently fail, download progress shows in overlay
+            }
+          }}>
+            <DownloadIcon />
+          </IconButton>
+        )}
         <IconButton onClick={() => navigate(`/instances/${instance.id}`)}>
           <SettingsIcon />
         </IconButton>
