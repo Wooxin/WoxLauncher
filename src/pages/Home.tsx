@@ -18,20 +18,23 @@ import LoginDialog from "../components/account/LoginDialog";
 export default function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { instances, loading, fetchInstances } = useInstanceStore();
-  const { activeAccount, fetchAccounts } = useAccountStore();
-  const { runtimes, fetchRuntimes } = useJavaStore();
+  const instances = useInstanceStore(s => s.instances);
+  const fetchInstances = useInstanceStore(s => s.fetchInstances);
+  const activeAccount = useAccountStore(s => s.activeAccount);
+  const fetchAccounts = useAccountStore(s => s.fetchAccounts);
+  const runtimes = useJavaStore(s => s.runtimes);
+  const fetchRuntimes = useJavaStore(s => s.fetchRuntimes);
   const [selectedId, setSelectedId] = useState("");
   const [loginOpen, setLoginOpen] = useState(false);
   const [launchStatus, setLaunchStatus] = useState<'idle' | 'installing' | 'launching'>('idle');
+  const [pageLoading, setPageLoading] = useState(true);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" | "info" }>({
     open: false, message: "", severity: "info"
   });
 
   useEffect(() => {
-    fetchInstances();
-    fetchAccounts();
-    fetchRuntimes();
+    Promise.all([fetchInstances(), fetchAccounts(), fetchRuntimes()])
+      .finally(() => setPageLoading(false));
   }, []);
 
   const selected = instances.find(i => i.id === selectedId) || null;
@@ -61,7 +64,7 @@ export default function Home() {
     }
   };
 
-  if (loading) return <CircularProgress />;
+  if (pageLoading) return <CircularProgress />;
 
   return (
     <Box>
