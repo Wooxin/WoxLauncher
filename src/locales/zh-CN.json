@@ -31,7 +31,11 @@
     "jvmArgs": "JVM 参数",
     "created": "创建时间",
     "notFound": "未找到实例",
-    "launchPlaceholder": "正在启动 {{name}}...（认证与 Java 选择将在后续版本中添加）"
+    "launchPlaceholder": "正在启动 {{name}}...（认证与 Java 选择将在后续版本中添加）",
+    "release": "正式版",
+    "snapshot": "测试版",
+    "selected": "已选择",
+    "selectVersionFirst": "请先选择版本"
   },
   "mod": {
     "title": "Mod 浏览",
@@ -78,7 +82,11 @@
     "defaultJvmArgs": "默认 JVM 参数",
     "maxMemory": "最大内存",
     "autoMemory": "自动内存",
-    "autoMemoryDesc": "自动检测系统内存并配置最优分配"
+    "autoMemoryDesc": "自动检测系统内存并配置最优分配",
+    "downloadPathValue": "./wox_data (启动器同目录)",
+    "javaInstallPath": "Java 安装路径",
+    "javaInstallPathDefault": "./wox_data/java",
+    "javaInstallPathHint": "留空使用默认路径 (启动器同目录)"
   },
   "account": {
     "title": "账户",
