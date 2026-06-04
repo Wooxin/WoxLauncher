@@ -8,7 +8,7 @@ use crate::utils::paths;
 use tauri::AppHandle;
 use tauri::Emitter;
 
-const MAX_CONCURRENT: usize = 64;
+const MAX_CONCURRENT: usize = 32;
 
 fn current_os_name() -> &'static str {
     if cfg!(target_os = "windows") {
@@ -170,24 +170,38 @@ async fn download_libraries(
     let os_name = current_os_name();
     let sem = Arc::new(tokio::sync::Semaphore::new(MAX_CONCURRENT));
     let mut tasks = tokio::task::JoinSet::new();
+    let total = libraries.iter().filter(|l| is_library_allowed(&l.rules)).count();
+    let completed = Arc::new(AtomicUsize::new(0));
+    let handle = app_handle.clone();
+
+    // Aggregate progress emitter for libraries
+    let agg_completed = Arc::clone(&completed);
+    let agg_handle = handle.clone();
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+            let done = agg_completed.load(Ordering::Relaxed);
+            let _ = agg_handle.emit(crate::events::EVENT_DOWNLOAD_PROGRESS, &crate::models::download::DownloadProgress {
+                downloaded: done as u64, total: total as u64,
+                percent: if total > 0 { (done as f64 / total as f64) * 100.0 } else { 0.0 },
+                speed: String::new(),
+                status: if done < total { crate::models::download::DownloadStatus::Downloading } else { crate::models::download::DownloadStatus::Done },
+                file_name: format!("Minecraft Libraries {}/{}", done, total),
+            });
+            if done >= total { break; }
+        }
+    });
 
     for lib in libraries.iter() {
         if !is_library_allowed(&lib.rules) { continue; }
-
-        // Skip already-downloaded libraries early
-        let already_exists = if let Some(ref natives) = lib.natives {
-            natives.get(os_name).map_or(false, |c| get_native_path(&lib.name, c).exists())
-        } else if let Some(ref downloads) = lib.downloads {
-            downloads.artifact.as_ref().map_or(false, |_| get_maven_path(&lib.name).exists())
-        } else {
-            false
-        };
-        if already_exists { continue; }
+        if lib.natives.as_ref().and_then(|n| n.get(os_name)).map_or(false, |c| get_native_path(&lib.name, c).exists()) { completed.fetch_add(1, Ordering::Relaxed); continue; }
+        if lib.downloads.as_ref().and_then(|d| d.artifact.as_ref()).map_or(false, |_| get_maven_path(&lib.name).exists()) { completed.fetch_add(1, Ordering::Relaxed); continue; }
 
         let lib = lib.clone();
         let os_name = os_name.to_string();
-        let app_handle = app_handle.clone();
+        let app_handle = handle.clone();
         let sem = Arc::clone(&sem);
+        let completed = Arc::clone(&completed);
 
         tasks.spawn(async move {
             let _permit = sem.acquire_owned().await.map_err(|e| WoxError::Internal(e.to_string()))?;
@@ -200,14 +214,12 @@ async fn download_libraries(
                                 let dest = get_native_path(&lib.name, classifier);
                                 if !dest.exists() {
                                     if let Some(parent) = dest.parent() { let _ = std::fs::create_dir_all(parent); }
-                                    crate::services::downloader::download_file_with_events(
-                                        &app_handle, &native_info.url, dest, None,
-                                        format!("Native {}", lib.name.split(':').last().unwrap_or(&lib.name)),
-                                    ).await?;
+                                    crate::services::downloader::download_file_with_events(&app_handle, &native_info.url, dest, None, String::new()).await?;
                                 }
                             }
                         }
                     }
+                    completed.fetch_add(1, Ordering::Relaxed);
                     return Ok::<_, WoxError>(());
                 }
             }
@@ -216,13 +228,11 @@ async fn download_libraries(
                     let dest = get_maven_path(&lib.name);
                     if !dest.exists() {
                         if let Some(parent) = dest.parent() { let _ = std::fs::create_dir_all(parent); }
-                        crate::services::downloader::download_file_with_events(
-                            &app_handle, &artifact.url, dest, None,
-                            format!("Library {}", lib.name.split(':').last().unwrap_or(&lib.name)),
-                        ).await?;
+                        crate::services::downloader::download_file_with_events(&app_handle, &artifact.url, dest, None, String::new()).await?;
                     }
                 }
             }
+            completed.fetch_add(1, Ordering::Relaxed);
             Ok::<_, WoxError>(())
         });
     }
