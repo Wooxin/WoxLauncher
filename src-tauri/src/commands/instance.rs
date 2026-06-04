@@ -1,0 +1,27 @@
+use crate::models::instance::InstanceConfig;
+use crate::services::instance_manager;
+
+#[tauri::command]
+pub fn list_instances() -> Result<Vec<InstanceConfig>, String> {
+    instance_manager::list_instances()
+}
+
+#[tauri::command]
+pub fn create_instance(config: InstanceConfig) -> Result<InstanceConfig, String> {
+    instance_manager::create_instance(config)
+}
+
+#[tauri::command]
+pub fn delete_instance(id: String) -> Result<(), String> {
+    instance_manager::delete_instance(&id)
+}
+
+#[tauri::command]
+pub fn get_instance(id: String) -> Result<InstanceConfig, String> {
+    instance_manager::get_instance(&id)
+}
+
+#[tauri::command]
+pub fn update_instance(config: InstanceConfig) -> Result<(), String> {
+    instance_manager::update_instance(config)
+}
