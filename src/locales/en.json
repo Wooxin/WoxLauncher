@@ -43,7 +43,13 @@
   "java": {
     "title": "Java Runtimes",
     "refresh": "Refresh",
-    "noRuntimes": "No Java runtimes detected. Install one to get started."
+    "noRuntimes": "No Java runtimes detected. Install one to get started.",
+    "downloadTitle": "Download Java",
+    "downloadBtn": "Download",
+    "vendorLabel": "Vendor",
+    "versionLabel": "Version",
+    "installing": "Installing {{vendor}} {{version}}...",
+    "installed": "{{vendor}} {{version}} installed successfully"
   },
   "settings": {
     "title": "Settings",
