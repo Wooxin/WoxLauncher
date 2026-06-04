@@ -8,10 +8,9 @@ export function useModSearch(query: string, source: ModSource, version?: string)
   return useQuery({
     queryKey: ["mods", source, query, version],
     queryFn: async () => {
-      if (!query.trim()) return [];
       switch (source) {
         case "modrinth":
-          return searchModrinth(query, version);
+          return searchModrinth(query.trim() || version || "", version);
         case "curseforge":
           return searchCurseForge(query, version);
         case "mcmod":
@@ -20,6 +19,6 @@ export function useModSearch(query: string, source: ModSource, version?: string)
           return [];
       }
     },
-    enabled: query.trim().length > 0,
+    enabled: true,
   });
 }
