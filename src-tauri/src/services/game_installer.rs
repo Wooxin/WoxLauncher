@@ -1,9 +1,14 @@
 use std::collections::HashMap;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use crate::error::WoxError;
 use crate::models::version::{AssetIndexInfo, Library, Rule, VersionJson};
 use crate::utils::paths;
 use tauri::AppHandle;
+use tauri::Emitter;
+
+const MAX_CONCURRENT: usize = 64;
 
 fn current_os_name() -> &'static str {
     if cfg!(target_os = "windows") {
@@ -163,41 +168,30 @@ async fn download_libraries(
     libraries: &[Library],
 ) -> Result<(), WoxError> {
     let os_name = current_os_name();
+    let sem = Arc::new(tokio::sync::Semaphore::new(MAX_CONCURRENT));
     let mut tasks = tokio::task::JoinSet::new();
 
     for lib in libraries.iter() {
-        if !is_library_allowed(&lib.rules) {
-            continue;
-        }
+        if !is_library_allowed(&lib.rules) { continue; }
 
         // Skip already-downloaded libraries early
         let already_exists = if let Some(ref natives) = lib.natives {
-            if let Some(classifier) = natives.get(os_name) {
-                let dest = get_native_path(&lib.name, classifier);
-                dest.exists()
-            } else {
-                false
-            }
+            natives.get(os_name).map_or(false, |c| get_native_path(&lib.name, c).exists())
         } else if let Some(ref downloads) = lib.downloads {
-            if let Some(ref _artifact) = downloads.artifact {
-                let dest = get_maven_path(&lib.name);
-                dest.exists()
-            } else {
-                false
-            }
+            downloads.artifact.as_ref().map_or(false, |_| get_maven_path(&lib.name).exists())
         } else {
             false
         };
-        if already_exists {
-            continue;
-        }
+        if already_exists { continue; }
 
         let lib = lib.clone();
         let os_name = os_name.to_string();
         let app_handle = app_handle.clone();
+        let sem = Arc::clone(&sem);
 
         tasks.spawn(async move {
-            // Handle native libraries
+            let _permit = sem.acquire_owned().await.map_err(|e| WoxError::Internal(e.to_string()))?;
+
             if let Some(ref natives) = lib.natives {
                 if let Some(classifier) = natives.get(&os_name) {
                     if let Some(ref downloads) = lib.downloads {
@@ -205,17 +199,11 @@ async fn download_libraries(
                             if let Some(native_info) = classifiers.get(classifier) {
                                 let dest = get_native_path(&lib.name, classifier);
                                 if !dest.exists() {
-                                    if let Some(parent) = dest.parent() {
-                                        let _ = std::fs::create_dir_all(parent);
-                                    }
+                                    if let Some(parent) = dest.parent() { let _ = std::fs::create_dir_all(parent); }
                                     crate::services::downloader::download_file_with_events(
-                                        &app_handle,
-                                        &native_info.url,
-                                        dest,
-                                        Some(&native_info.sha1),
+                                        &app_handle, &native_info.url, dest, Some(&native_info.sha1),
                                         format!("Native {}", lib.name.split(':').last().unwrap_or(&lib.name)),
-                                    )
-                                    .await?;
+                                    ).await?;
                                 }
                             }
                         }
@@ -223,23 +211,15 @@ async fn download_libraries(
                     return Ok::<_, WoxError>(());
                 }
             }
-
-            // Download main artifact
             if let Some(ref downloads) = lib.downloads {
                 if let Some(ref artifact) = downloads.artifact {
                     let dest = get_maven_path(&lib.name);
                     if !dest.exists() {
-                        if let Some(parent) = dest.parent() {
-                            let _ = std::fs::create_dir_all(parent);
-                        }
+                        if let Some(parent) = dest.parent() { let _ = std::fs::create_dir_all(parent); }
                         crate::services::downloader::download_file_with_events(
-                            &app_handle,
-                            &artifact.url,
-                            dest,
-                            Some(&artifact.sha1),
+                            &app_handle, &artifact.url, dest, Some(&artifact.sha1),
                             format!("Library {}", lib.name.split(':').last().unwrap_or(&lib.name)),
-                        )
-                        .await?;
+                        ).await?;
                     }
                 }
             }
@@ -247,11 +227,9 @@ async fn download_libraries(
         });
     }
 
-    // Drain remaining tasks
     while let Some(result) = tasks.join_next().await {
         result.map_err(|e| WoxError::Internal(e.to_string()))??;
     }
-
     Ok(())
 }
 
@@ -259,75 +237,82 @@ async fn download_assets(
     app_handle: &AppHandle,
     asset_index: &AssetIndexInfo,
 ) -> Result<(), WoxError> {
-    // Download asset index JSON
     let indexes_dir = paths::assets_dir().join("indexes");
     let index_path = indexes_dir.join(format!("{}.json", asset_index.id));
     if !index_path.exists() {
         std::fs::create_dir_all(&indexes_dir)?;
         crate::services::downloader::download_file_with_events(
-            app_handle,
-            &asset_index.url,
-            index_path.clone(),
-            Some(&asset_index.sha1),
+            app_handle, &asset_index.url, index_path.clone(), Some(&asset_index.sha1),
             format!("Asset index {}", asset_index.id),
-        )
-        .await?;
+        ).await?;
     }
 
-    // Parse asset index to get individual asset list
     let json_str = std::fs::read_to_string(&index_path)?;
     #[derive(serde::Deserialize)]
-    struct AssetObjects {
-        objects: HashMap<String, AssetObject>,
-    }
+    struct AssetObjects { objects: HashMap<String, AssetObject> }
     #[derive(serde::Deserialize)]
-    struct AssetObject {
-        hash: String,
-        size: u64,
-    }
+    struct AssetObject { hash: String, size: u64 }
 
     let index: AssetObjects = serde_json::from_str(&json_str)
         .map_err(|e| WoxError::Internal(format!("Failed to parse asset index: {}", e)))?;
 
     let objects_dir = paths::assets_dir().join("objects");
     let base_url = "https://resources.download.minecraft.net";
+    let sem = Arc::new(tokio::sync::Semaphore::new(MAX_CONCURRENT));
     let mut tasks = tokio::task::JoinSet::new();
-    let mut downloaded = 0usize;
     let total = index.objects.len();
+    let completed = Arc::new(AtomicUsize::new(0));
+    let handle = app_handle.clone();
+
+    // Emit aggregate progress periodically
+    let agg_completed = Arc::clone(&completed);
+    let agg_handle = handle.clone();
+    let agg_total = total;
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+            let done = agg_completed.load(Ordering::Relaxed);
+            let _ = agg_handle.emit(crate::events::EVENT_DOWNLOAD_PROGRESS, &crate::models::download::DownloadProgress {
+                downloaded: done as u64,
+                total: agg_total as u64,
+                percent: if agg_total > 0 { (done as f64 / agg_total as f64) * 100.0 } else { 0.0 },
+                speed: String::new(),
+                status: if done < agg_total { crate::models::download::DownloadStatus::Downloading } else { crate::models::download::DownloadStatus::Done },
+                file_name: format!("Assets {}/{}", done, agg_total),
+            });
+            if done >= agg_total { break; }
+        }
+    });
 
     for (_key, obj) in &index.objects {
         let hash = obj.hash.clone();
         let first2 = hash[..2].to_string();
-        let sub_path = format!("{}/{}", first2, hash);
-        let dest = objects_dir.join(&sub_path);
+        let dest = objects_dir.join(format!("{}/{}", first2, hash));
 
         if dest.exists() {
-            downloaded += 1;
+            completed.fetch_add(1, Ordering::Relaxed);
             continue;
         }
+        if let Some(parent) = dest.parent() { std::fs::create_dir_all(parent)?; }
 
-        if let Some(parent) = dest.parent() {
-            std::fs::create_dir_all(parent)?;
-        }
-
-        let url = format!("{}/{}", base_url, sub_path);
-        let app_handle = app_handle.clone();
-        downloaded += 1;
-        let label = format!("Asset {}/{}", downloaded, total);
+        let url = format!("{}/{}", base_url, format!("{}/{}", first2, hash));
+        let app_handle = handle.clone();
+        let sem = Arc::clone(&sem);
+        let completed = Arc::clone(&completed);
 
         tasks.spawn(async move {
-            crate::services::downloader::download_file_with_events(
-                &app_handle, &url, dest, None, label,
-            )
-            .await
+            let _permit = sem.acquire_owned().await.map_err(|e| WoxError::Internal(e.to_string()))?;
+            let result = crate::services::downloader::download_file_with_events(
+                &app_handle, &url, dest, None, String::new(),
+            ).await;
+            completed.fetch_add(1, Ordering::Relaxed);
+            result
         });
     }
 
-    // Drain remaining tasks
     while let Some(result) = tasks.join_next().await {
         result.map_err(|e| WoxError::Internal(e.to_string()))??;
     }
-
     Ok(())
 }
 
