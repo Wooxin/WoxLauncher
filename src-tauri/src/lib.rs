@@ -5,6 +5,7 @@ mod utils;
 mod error;
 mod app_state;
 mod events;
+mod database;
 
 use app_state::AppState;
 use utils::requests;

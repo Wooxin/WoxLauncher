@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-fn wox_data_dir() -> PathBuf {
+pub fn wox_data_dir() -> PathBuf {
     // Portable: data directory next to the executable
     let exe_dir = std::env::current_exe()
         .ok()
@@ -15,5 +15,4 @@ pub fn libraries_dir() -> PathBuf { shared_dir().join("libraries") }
 pub fn versions_dir() -> PathBuf { shared_dir().join("versions") }
 pub fn assets_dir() -> PathBuf { shared_dir().join("assets") }
 pub fn java_dir() -> PathBuf { wox_data_dir().join("java") }
-pub fn accounts_file() -> PathBuf { wox_data_dir().join("accounts.json") }
 pub fn instance_dir(id: &str) -> PathBuf { instances_dir().join(id) }

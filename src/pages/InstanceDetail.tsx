@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-  Typography, Box, Card, CardContent, Button, Chip,
+  Typography, Box, Card, CardContent, Button, Chip, IconButton,
   CircularProgress, TextField, MenuItem, Tabs, Tab, Snackbar, Alert,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import SaveIcon from "@mui/icons-material/Save";
+import DownloadIcon from "@mui/icons-material/Download";
 import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 import { ALL_LOADERS } from "../constants";
 import { useJavaStore } from "../stores/javaStore";
 import { useModSearch } from "../hooks/useModSearch";
 import ModCard from "../components/mod/ModCard";
+import { getModrinthMod } from "../services/modrinth";
 import type { InstanceConfig, LoaderType } from "../types";
 
 interface TabPanelProps {
@@ -159,7 +161,25 @@ export default function InstanceDetail() {
           helperText={instance ? `Filtered by Minecraft ${instance.gameVersion}` : ""}
         />
         {modResults?.map((mod) => (
-          <ModCard key={`${mod.source}-${mod.id}`} mod={mod} />
+          <Box key={`${mod.source}-${mod.id}`} sx={{ mb: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+              <Box sx={{ flex: 1 }}>
+                <ModCard mod={mod} />
+              </Box>
+              <IconButton size="small" color="primary"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    const modDetail = await getModrinthMod(mod.id);
+                    const dlUrl = (modDetail as any).downloadUrl || `https://modrinth.com/mod/${mod.id}`;
+                    setSnackbar({ open: true, message: `Download URL: ${dlUrl}`, severity: "info" });
+                  } catch {}
+                }}
+              >
+                <DownloadIcon />
+              </IconButton>
+            </Box>
+          </Box>
         ))}
         {modResults?.length === 0 && modQuery && (
           <Typography color="text.secondary" sx={{ textAlign: "center", mt: 2 }}>

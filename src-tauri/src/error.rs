@@ -45,3 +45,10 @@ impl From<serde_json::Error> for WoxError {
         WoxError::Internal(e.to_string())
     }
 }
+
+impl From<rusqlite::Error> for WoxError {
+    fn from(e: rusqlite::Error) -> Self {
+        WoxError::Internal(e.to_string())
+    }
+}
+
