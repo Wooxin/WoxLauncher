@@ -8,6 +8,10 @@ pub enum LoaderType {
     Fabric,
     Forge,
     Quilt,
+    NeoForge,
+    LiteLoader,
+    Rift,
+    OptiFine,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
