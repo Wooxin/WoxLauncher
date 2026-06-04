@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub struct MinecraftVersion {
     pub id: String,
-    #[serde(rename = "type")]
+    #[serde(alias = "type")]
     pub version_type: String,
     pub release_time: String,
 }
