@@ -2,8 +2,6 @@ use crate::error::WoxError;
 use crate::models::download::{DownloadProgress, DownloadStatus};
 use crate::utils::requests;
 use std::path::PathBuf;
-use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::Emitter;
 use tokio::io::AsyncWriteExt;
 
@@ -126,16 +124,15 @@ pub async fn download_file_with_events(
     sha1: Option<&str>,
     file_label: String,
 ) -> Result<(), WoxError> {
-    let label = file_label;
-    let handle = app_handle.clone();
     let max_retries = 3u32;
 
     for attempt in 1..=max_retries {
-        // Delete any partial/corrupted file before retry
         if attempt > 1 {
             let _ = tokio::fs::remove_file(&dest).await;
         }
 
+        let handle = app_handle.clone();
+        let label = file_label.clone();
         match download_file(url, dest.clone(), sha1, move |progress| {
             let mut p = progress;
             p.file_name = label.clone();
@@ -143,12 +140,12 @@ pub async fn download_file_with_events(
         }).await {
             Ok(()) => return Ok(()),
             Err(WoxError::Validation(e)) if e.starts_with("SHA1") && attempt < max_retries => {
-                eprintln!("Retry {}/{} for {}: {}", attempt, max_retries, label, e);
+                eprintln!("Retry {}/{} for {}: {}", attempt, max_retries, file_label, e);
                 continue;
             },
             Err(e) => return Err(e),
         }
     }
 
-    Err(WoxError::Validation(format!("Failed after {} retries: {}", max_retries, label)))
+    Err(WoxError::Validation(format!("Failed after {} retries: {}", max_retries, file_label)))
 }
