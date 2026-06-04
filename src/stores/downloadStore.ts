@@ -19,15 +19,28 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
 
   startListening: async () => {
     if (get().isListening) return;
+    let pending: Record<string, DownloadProgress> = {};
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
     const unlisten = await listen<DownloadProgress>("download:progress", (event) => {
       const progress = event.payload;
-      set((state) => {
-        const next = { ...state.downloads, [progress.fileName]: progress };
-        const active = Object.values(next).filter(
-          (d) => d.status === "downloading" || d.status === "verifying"
-        ).length;
-        return { downloads: next, activeCount: active };
-      });
+      pending[progress.fileName] = progress;
+
+      // Batch updates every 80ms to reduce re-renders
+      if (!timer) {
+        timer = setTimeout(() => {
+          const batch = { ...pending };
+          pending = {};
+          timer = null;
+          set((state) => {
+            const next = { ...state.downloads, ...batch };
+            const active = Object.values(next).filter(
+              (d) => d.status === "downloading" || d.status === "verifying"
+            ).length;
+            return { downloads: next, activeCount: active };
+          });
+        }, 80);
+      }
     });
     set({ isListening: true, unlisten });
   },
