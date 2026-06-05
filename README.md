@@ -15,9 +15,6 @@ WoxLauncher 是一个使用 Tauri、React 和 Rust 开发的 Minecraft 启动器
 - 下载日志、右下角下载面板和右上角通知
 
 ## 数据目录
-
-运行时数据不会提交到仓库，默认结构如下：
-
 ```text
 woxlauncher/
   .minecraft/
@@ -34,9 +31,8 @@ woxlauncher/
 npm install
 npm run build
 npm run tauri dev
+npm run tauri build
 ```
-
-Windows 下编译 Tauri/Rust 项目请使用 `x64 Native Tools Command Prompt for VS`，否则可能出现 `link.exe not found`。
 
 ## 说明
 
