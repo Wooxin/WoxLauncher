@@ -15,6 +15,7 @@ WoxLauncher 是一个使用 Tauri、React 和 Rust 开发的 Minecraft 启动器
 - 下载日志、右下角下载面板和右上角通知
 
 ## 数据目录
+
 ```text
 woxlauncher/
   .minecraft/

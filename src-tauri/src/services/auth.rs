@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 
-const MS_CLIENT_ID: &str = "00000000402b5328";
+const MS_CLIENT_ID: &str = "d398e2a0-59cb-4c6c-81c6-cbd9b7c1d366";
 const MS_AUTH_URL: &str = "https://login.live.com/oauth20_authorize.srf";
 const MS_TOKEN_URL: &str = "https://login.live.com/oauth20_token.srf";
 const MS_XBL_AUTH_URL: &str = "https://user.auth.xboxlive.com/user/authenticate";

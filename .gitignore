@@ -18,6 +18,9 @@ wox_data/
 *.sqlite
 *.db
 
+# Local design notes
+docs/
+
 # Tauri build outputs
 src-tauri/target/
 
