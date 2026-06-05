@@ -43,8 +43,8 @@ export default memo(function Sidebar({ width, collapsed }: SidebarProps) {
         "& .MuiDrawer-paper": {
           width,
           boxSizing: "border-box",
-          bgcolor: "#1E1E1E",
-          borderRight: "1px solid #333",
+          bgcolor: "#171717",
+          borderRight: "1px solid #2B2B2B",
           overflowX: "hidden",
           display: "flex",
           flexDirection: "column",
@@ -52,10 +52,10 @@ export default memo(function Sidebar({ width, collapsed }: SidebarProps) {
       }}
     >
       {/* Logo */}
-      <Box sx={{ p: 2, pt: 3, pb: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
-        <GrassIcon sx={{ color: "primary.main", fontSize: 28 }} />
+      <Box sx={{ px: 2, pt: 3, pb: 2.5, display: "flex", alignItems: "center", gap: 1.5 }}>
+        <GrassIcon sx={{ color: "primary.light", fontSize: 26 }} />
         {!collapsed && (
-          <Typography variant="h6" sx={{ fontWeight: 800, color: "primary.main", letterSpacing: 0.5 }}>
+          <Typography variant="h6" sx={{ fontWeight: 800, color: "text.primary" }}>
             {t("app.title")}
           </Typography>
         )}
@@ -78,9 +78,9 @@ export default memo(function Sidebar({ width, collapsed }: SidebarProps) {
               }}
             >
               <ListItemIcon sx={{
-                minWidth: collapsed ? 0 : 40,
+                minWidth: collapsed ? 0 : 38,
                 justifyContent: "center",
-                color: isActive(item.path) ? "primary.main" : "text.secondary",
+                color: isActive(item.path) ? "primary.light" : "text.secondary",
               }}>
                 {item.icon}
               </ListItemIcon>
@@ -108,9 +108,9 @@ export default memo(function Sidebar({ width, collapsed }: SidebarProps) {
               }}
             >
               <ListItemIcon sx={{
-                minWidth: collapsed ? 0 : 40,
+                minWidth: collapsed ? 0 : 38,
                 justifyContent: "center",
-                color: isActive(item.path) ? "primary.main" : "text.secondary",
+                color: isActive(item.path) ? "primary.light" : "text.secondary",
               }}>
                 {item.icon}
               </ListItemIcon>

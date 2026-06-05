@@ -25,6 +25,9 @@ interface SettingsState {
   maxDownloadThreads: number;
   defaultJvmArgs: string;
   maxMemoryGb: number;
+  fullscreen: boolean;
+  resolutionWidth: number;
+  resolutionHeight: number;
   javaInstallPath: string;
   setTheme: (theme: "dark" | "light") => void;
   setKeepOpen: (keepOpen: boolean) => void;
@@ -33,6 +36,8 @@ interface SettingsState {
   setMaxDownloadThreads: (threads: number) => void;
   setDefaultJvmArgs: (args: string) => void;
   setMaxMemoryGb: (gb: number) => void;
+  setFullscreen: (fullscreen: boolean) => void;
+  setResolution: (width: number, height: number) => void;
   setJavaInstallPath: (path: string) => void;
 }
 
@@ -46,6 +51,9 @@ export const useSettingsStore = create<SettingsState>()(
       maxDownloadThreads: 4,
       defaultJvmArgs: getAutoJvmArgs(),
       maxMemoryGb: detectMemoryGb(),
+      fullscreen: false,
+      resolutionWidth: 1920,
+      resolutionHeight: 1080,
       javaInstallPath: "",
       setTheme: (theme) => set({ theme }),
       setKeepOpen: (keepOpen) => set({ keepOpen }),
@@ -58,6 +66,8 @@ export const useSettingsStore = create<SettingsState>()(
       setMaxDownloadThreads: (maxDownloadThreads) => set({ maxDownloadThreads }),
       setDefaultJvmArgs: (defaultJvmArgs) => set({ defaultJvmArgs }),
       setMaxMemoryGb: (maxMemoryGb) => set({ maxMemoryGb }),
+      setFullscreen: (fullscreen) => set({ fullscreen }),
+      setResolution: (resolutionWidth, resolutionHeight) => set({ resolutionWidth, resolutionHeight }),
       setJavaInstallPath: (javaInstallPath) => set({ javaInstallPath }),
     }),
     {

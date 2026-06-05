@@ -1,8 +1,8 @@
-import type { ModResult } from "../types";
+import type { ModResult, ProjectKind } from "../types";
 
 const BASE = "https://api.mcmod.cn/v2";
 
-export async function searchMcmod(query: string, _version?: string): Promise<ModResult[]> {
+export async function searchMcmod(query: string, _version?: string, kind: ProjectKind = "mod"): Promise<ModResult[]> {
   try {
     const url = `${BASE}/search?keyword=${encodeURIComponent(query)}&limit=20`;
     const resp = await fetch(url, {
@@ -15,7 +15,7 @@ export async function searchMcmod(query: string, _version?: string): Promise<Mod
     const data = await resp.json();
     if (!data.data?.list) return [];
 
-    return data.data.list.map((m: any) => ({
+    const results = data.data.list.map((m: any) => ({
       id: String(m.id || m.modid),
       source: "mcmod" as const,
       name: m.name || m.title || "",
@@ -26,6 +26,11 @@ export async function searchMcmod(query: string, _version?: string): Promise<Mod
       versions: m.mc_versions || m.versions || [],
       author: m.author || m.authors?.[0] || "",
     }));
+    return results.filter((item: ModResult) => {
+      const text = `${item.name} ${item.summary} ${item.categories.join(" ")}`.toLowerCase();
+      const isPack = text.includes("整合") || text.includes("modpack") || text.includes("pack");
+      return kind === "modpack" ? isPack : !isPack;
+    });
   } catch {
     return [];
   }

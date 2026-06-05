@@ -23,10 +23,13 @@
     "loader": "加载器",
     "cancel": "取消",
     "create": "创建",
+    "save": "保存",
+    "saved": "已保存",
     "configuration": "配置",
     "launch": "启动",
     "java": "Java",
     "javaVersion": "版本 {{version}}",
+    "requiredJava": "推荐 Java {{version}}",
     "resolution": "分辨率",
     "jvmArgs": "JVM 参数",
     "created": "创建时间",
@@ -43,7 +46,12 @@
     "noResults": "未找到 \"{{query}}\" 的相关结果",
     "downloads": "{{count}} 次下载",
     "details": "Mod 详情",
-    "comingSoon": "即将推出"
+    "comingSoon": "即将推出",
+    "source": "来源",
+    "category": "分类",
+    "downloadUnsupported": "当前只支持从 Modrinth 直接下载",
+    "noDownloadUrl": "{{name}} 没有可用下载链接",
+    "downloaded": "{{name}} 已加入下载队列"
   },
   "java": {
     "title": "Java 运行时",
@@ -83,10 +91,10 @@
     "maxMemory": "最大内存",
     "autoMemory": "自动内存",
     "autoMemoryDesc": "自动检测系统内存并配置最优分配",
-    "downloadPathValue": "./wox_data (启动器同目录)",
+    "downloadPathValue": "./woxlauncher (启动器同目录)",
     "javaInstallPath": "Java 安装路径",
-    "javaInstallPathDefault": "./wox_data/java",
-    "javaInstallPathHint": "留空使用默认路径 (启动器同目录)"
+    "javaInstallPathDefault": "./woxlauncher/java (启动器同目录)",
+    "javaInstallPathHint": "Java 将始终安装在启动器同目录"
   },
   "account": {
     "title": "账户",

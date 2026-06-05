@@ -1,5 +1,5 @@
-use crate::models::java::{JavaRuntime, JavaVendor};
 use crate::error::WoxError;
+use crate::models::java::{JavaRuntime, JavaVendor};
 use crate::utils::paths;
 use std::path::PathBuf;
 
@@ -37,11 +37,12 @@ pub fn detect_installed(custom_path: Option<&str>) -> Result<Vec<JavaRuntime>, W
     }
 
     // Check PATH for java
-    let which_cmd = if cfg!(target_os = "windows") { "where" } else { "which" };
-    if let Ok(output) = std::process::Command::new(which_cmd)
-        .arg("java")
-        .output()
-    {
+    let which_cmd = if cfg!(target_os = "windows") {
+        "where"
+    } else {
+        "which"
+    };
+    if let Ok(output) = std::process::Command::new(which_cmd).arg("java").output() {
         if output.status.success() {
             let path = String::from_utf8_lossy(&output.stdout)
                 .lines()
@@ -65,7 +66,9 @@ pub fn detect_installed(custom_path: Option<&str>) -> Result<Vec<JavaRuntime>, W
 }
 
 fn scan_java_dir(dir: &PathBuf, runtimes: &mut Vec<JavaRuntime>, id_prefix: &str) {
-    if !dir.exists() { return; }
+    if !dir.exists() {
+        return;
+    }
     if let Ok(entries) = std::fs::read_dir(dir) {
         for entry in entries.flatten() {
             let java_exe = if cfg!(target_os = "windows") {
@@ -89,7 +92,10 @@ fn scan_java_dir(dir: &PathBuf, runtimes: &mut Vec<JavaRuntime>, id_prefix: &str
 }
 
 fn detect_java_version(java_path: &str) -> String {
-    if let Ok(output) = std::process::Command::new(java_path).arg("-version").output() {
+    if let Ok(output) = std::process::Command::new(java_path)
+        .arg("-version")
+        .output()
+    {
         let stderr = String::from_utf8_lossy(&output.stderr);
         for part in stderr.split('"') {
             if part.contains('.') && part.chars().any(|c| c.is_ascii_digit()) {
@@ -111,10 +117,6 @@ fn parse_java_folder(name: &str) -> (JavaVendor, String) {
     } else {
         JavaVendor::Adoptium
     };
-    let version = name
-        .split('-')
-        .last()
-        .unwrap_or(name)
-        .to_string();
+    let version = name.split('-').last().unwrap_or(name).to_string();
     (vendor, version)
 }

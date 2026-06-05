@@ -23,10 +23,13 @@
     "loader": "ローダー",
     "cancel": "キャンセル",
     "create": "作成",
+    "save": "保存",
+    "saved": "保存しました",
     "configuration": "設定",
     "launch": "起動",
     "java": "Java",
     "javaVersion": "バージョン {{version}}",
+    "requiredJava": "Recommended Java {{version}}",
     "resolution": "解像度",
     "jvmArgs": "JVM 引数",
     "created": "作成日",
@@ -39,7 +42,12 @@
     "noResults": "\"{{query}}\" の結果が見つかりません",
     "downloads": "{{count}} ダウンロード",
     "details": "Mod 詳細",
-    "comingSoon": "近日公開"
+    "comingSoon": "近日公開",
+    "source": "ソース",
+    "category": "カテゴリ",
+    "downloadUnsupported": "Direct downloads are currently supported for Modrinth only",
+    "noDownloadUrl": "{{name}} has no available download URL",
+    "downloaded": "{{name}} added to downloads"
   },
   "java": {
     "title": "Java ランタイム",

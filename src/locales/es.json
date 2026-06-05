@@ -23,10 +23,13 @@
     "loader": "Cargador",
     "cancel": "Cancelar",
     "create": "Crear",
+    "save": "Guardar",
+    "saved": "Guardado",
     "configuration": "Configuración",
     "launch": "Iniciar",
     "java": "Java",
     "javaVersion": "Versión {{version}}",
+    "requiredJava": "Java {{version}} recomendado",
     "resolution": "Resolución",
     "jvmArgs": "Argumentos JVM",
     "created": "Creado",
@@ -39,7 +42,12 @@
     "noResults": "Sin resultados para \"{{query}}\"",
     "downloads": "{{count}} descargas",
     "details": "Detalles del mod",
-    "comingSoon": "Próximamente"
+    "comingSoon": "Próximamente",
+    "source": "Fuente",
+    "category": "Categoría",
+    "downloadUnsupported": "Direct downloads are currently supported for Modrinth only",
+    "noDownloadUrl": "{{name}} has no available download URL",
+    "downloaded": "{{name}} added to downloads"
   },
   "java": {
     "title": "Runtimes de Java",

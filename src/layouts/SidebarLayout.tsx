@@ -38,10 +38,12 @@ export default function SidebarLayout() {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          px: { xs: 2, md: 4 },
+          py: 3,
           overflow: "auto",
           height: "100%",
           position: "relative",
+          bgcolor: "background.default",
         }}
       >
         <IconButton
@@ -51,14 +53,16 @@ export default function SidebarLayout() {
             top: 12,
             left: 12,
             zIndex: 10,
-            bgcolor: "background.paper",
-            boxShadow: 1,
+            bgcolor: "#202020",
+            border: "1px solid",
+            borderColor: "divider",
+            boxShadow: "none",
             "&:hover": { bgcolor: "action.hover" },
           }}
         >
           {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </IconButton>
-        <Box sx={{ mt: 5 }}>
+        <Box sx={{ mt: 4, maxWidth: 1180, mx: "auto" }}>
           <Outlet />
         </Box>
       </Box>

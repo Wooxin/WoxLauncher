@@ -1,22 +1,23 @@
+mod app_state;
+mod commands;
+mod database;
+mod error;
+mod events;
 mod models;
 mod services;
-mod commands;
 mod utils;
-mod error;
-mod app_state;
-mod events;
-mod database;
 
 use app_state::AppState;
-use utils::requests;
-use tauri::Manager;
-use tauri::tray::TrayIconBuilder;
 use tauri::menu::{MenuBuilder, MenuItemBuilder};
+use tauri::tray::TrayIconBuilder;
+use tauri::Manager;
+use utils::requests;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(AppState {
             http: requests::http_client().clone(),
         })
@@ -30,17 +31,17 @@ pub fn run() {
                 .icon(icon)
                 .tooltip("WoxLauncher")
                 .menu(&menu)
-                .on_menu_event(move |app, event| {
-                    match event.id().as_ref() {
-                        "show" => {
-                            if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                            }
+                .on_menu_event(move |app, event| match event.id().as_ref() {
+                    "show" => {
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
                         }
-                        "quit" => { app.exit(0); }
-                        _ => {}
                     }
+                    "quit" => {
+                        app.exit(0);
+                    }
+                    _ => {}
                 })
                 .build(app)?;
             Ok(())
@@ -68,9 +69,16 @@ pub fn run() {
             commands::java::detect_java,
             commands::minecraft::fetch_version_manifest,
             commands::download::start_download,
+            commands::download::install_mod_to_instance,
+            commands::download::list_local_mods,
+            commands::download::delete_local_mod,
+            commands::download::backup_local_mod,
             commands::download::get_wox_data_dir,
             commands::java_download::download_java,
             commands::game_installer::install_game_version,
+            commands::game_installer::install_instance,
+            commands::modpack::import_modpack,
+            commands::modpack::import_modpack_from_url,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

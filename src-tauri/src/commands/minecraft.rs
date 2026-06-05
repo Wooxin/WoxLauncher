@@ -13,8 +13,11 @@ pub struct MinecraftVersion {
 }
 
 #[tauri::command]
-pub async fn fetch_version_manifest(state: tauri::State<'_, AppState>) -> Result<Vec<MinecraftVersion>, WoxError> {
-    let resp = state.http
+pub async fn fetch_version_manifest(
+    state: tauri::State<'_, AppState>,
+) -> Result<Vec<MinecraftVersion>, WoxError> {
+    let resp = state
+        .http
         .get("https://launchermeta.mojang.com/mc/game/version_manifest.json")
         .send()
         .await
@@ -25,6 +28,9 @@ pub async fn fetch_version_manifest(state: tauri::State<'_, AppState>) -> Result
         versions: Vec<MinecraftVersion>,
     }
 
-    let manifest: Manifest = resp.json().await.map_err(|e| WoxError::Internal(e.to_string()))?;
+    let manifest: Manifest = resp
+        .json()
+        .await
+        .map_err(|e| WoxError::Internal(e.to_string()))?;
     Ok(manifest.versions)
 }

@@ -7,6 +7,8 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 import { useSettingsStore } from "../../stores/settingsStore";
+import { useJavaStore } from "../../stores/javaStore";
+import { getRequiredJavaMajor, selectRuntimeForGameVersion } from "../../utils/java";
 import type { InstanceConfig, LoaderType, MinecraftVersion } from "../../types";
 
 interface Props {
@@ -19,22 +21,18 @@ function getCompatibleLoaders(versionId: string): LoaderType[] {
   const parts = versionId.split(".").map(Number);
   const major = parts[0] || 0;
   const minor = parts[1] || 0;
-  const patch = parts[2] || 0;
 
   const loaders: LoaderType[] = ["vanilla"];
   if (major > 1 || (major === 1 && minor >= 14)) loaders.push("fabric");
   if (major > 1 || (major === 1 && minor >= 18)) loaders.push("quilt");
-  if (major > 1 || (major === 1 && (minor > 20 || (minor === 20 && patch >= 1)))) loaders.push("neoforge");
   if (major > 1 || (major === 1 && minor >= 1)) loaders.push("forge");
-  loaders.push("optifine");
-  if (major === 1 && minor >= 7 && minor <= 12) loaders.push("liteloader");
-  if (major === 1 && minor === 13) loaders.push("rift");
   return loaders;
 }
 
 export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props) {
   const { t } = useTranslation();
-  const { defaultJvmArgs } = useSettingsStore();
+  const { defaultJvmArgs, fullscreen } = useSettingsStore();
+  const { runtimes, fetchRuntimes } = useJavaStore();
   const [name, setName] = useState("");
   const [gameVersion, setGameVersion] = useState<MinecraftVersion | null>(null);
   const [loaderType, setLoaderType] = useState<LoaderType>("vanilla");
@@ -49,6 +47,7 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
         .then(setVersions)
         .catch(() => setVersions([]))
         .finally(() => setVersionsLoading(false));
+      fetchRuntimes();
     }
   }, [open]);
 
@@ -60,6 +59,8 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
     () => gameVersion ? getCompatibleLoaders(gameVersion.id) : [],
     [gameVersion]
   );
+  const requiredJava = gameVersion ? getRequiredJavaMajor(gameVersion.id) : null;
+  const selectedJava = gameVersion ? selectRuntimeForGameVersion(runtimes, gameVersion.id) : null;
 
   const handleVersionSelect = (version: MinecraftVersion) => {
     const loaders = getCompatibleLoaders(version.id);
@@ -70,17 +71,21 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
   };
 
   const handleSubmit = () => {
+    const selectedVersion = gameVersion?.id || "1.21";
+    const instanceName = name.trim() || selectedVersion;
     onSubmit({
       id: "",
-      name,
-      gameVersion: gameVersion?.id || "1.21",
+      name: instanceName,
+      gameVersion: selectedVersion,
       loaderType,
       loaderVersion: "",
-      javaVersion: "17",
+      javaVersion: selectedJava?.path || String(requiredJava || 17),
       jvmArgs: defaultJvmArgs ? defaultJvmArgs.split(" ").filter(Boolean) : ["-Xmx2G"],
       gameArgs: [],
       resolutionWidth: 1920,
       resolutionHeight: 1080,
+      fullscreen,
+      useInstanceSettings: false,
       createdAt: new Date().toISOString(),
       lastPlayedAt: null,
       downloaded: false,
@@ -144,6 +149,12 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
                 {t("instance.selected")}: {gameVersion.id} ({gameVersion.versionType})
               </Typography>
             )}
+            {gameVersion && (
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: "block" }}>
+                {t("instance.requiredJava", { version: requiredJava })}
+                {selectedJava ? ` - ${selectedJava.vendor} ${selectedJava.version}` : ""}
+              </Typography>
+            )}
           </Grid>
 
           <Grid size={{ xs: 12, md: 5 }}>
@@ -179,7 +190,7 @@ export default function CreateInstanceDialog({ open, onClose, onSubmit }: Props)
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t("instance.cancel")}</Button>
-        <Button onClick={handleSubmit} variant="contained" disabled={!name.trim() || !gameVersion}>
+        <Button onClick={handleSubmit} variant="contained" disabled={!gameVersion}>
           {t("instance.create")}
         </Button>
       </DialogActions>

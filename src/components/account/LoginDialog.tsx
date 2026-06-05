@@ -5,6 +5,7 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useAccountStore } from "../../stores/accountStore";
+import { formatError } from "../../utils/error";
 
 interface Props {
   open: boolean;
@@ -37,7 +38,7 @@ export default function LoginDialog({ open, onClose }: Props) {
     setLoginLoading(true);
     msLogin()
       .then(() => onClose())
-      .catch((e) => setLocalError(typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)))
+      .catch((e) => setLocalError(formatError(e)))
       .finally(() => setLoginLoading(false));
   };
 
@@ -47,7 +48,7 @@ export default function LoginDialog({ open, onClose }: Props) {
     setLoginLoading(true);
     loginOffline(username)
       .then(() => onClose())
-      .catch((e) => setLocalError(typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)))
+      .catch((e) => setLocalError(formatError(e)))
       .finally(() => setLoginLoading(false));
   };
 
@@ -57,7 +58,7 @@ export default function LoginDialog({ open, onClose }: Props) {
     setLoginLoading(true);
     loginAuthlib(serverUrl, username, password)
       .then(() => onClose())
-      .catch((e) => setLocalError(typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)))
+      .catch((e) => setLocalError(formatError(e)))
       .finally(() => setLoginLoading(false));
   };
 

@@ -17,7 +17,7 @@ function cleanFileName(name: string): string {
   // Remove path prefixes, keep only the meaningful part
   return name
     .replace(/\\/g, "/")
-    .replace(/.*\/wox_data\//, "")
+    .replace(/.*\/woxlauncher\//, "")
     .replace(/.*\/libraries\//, "lib: ")
     .replace(/.*\/versions\//, "ver: ")
     .replace(/.*\/assets\//, "assets: ")
@@ -33,6 +33,7 @@ function formatSize(bytes: number): string {
 
 export default function DownloadProgressBar({ progress }: Props) {
   const percent = Math.round(progress.percent);
+  const isFileBatch = progress.fileName === "Minecraft Libraries" || progress.fileName === "Assets";
   return (
     <Box sx={{ width: "100%", mb: 1 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
@@ -41,7 +42,9 @@ export default function DownloadProgressBar({ progress }: Props) {
         </Typography>
         <Box sx={{ display: "flex", gap: 0.5, alignItems: "center", flexShrink: 0 }}>
           <Typography variant="caption" sx={{ fontSize: 10 }}>
-            {formatSize(progress.downloaded)} / {formatSize(progress.total)}
+            {isFileBatch
+              ? `${progress.downloaded} / ${progress.total} files`
+              : `${formatSize(progress.downloaded)} / ${formatSize(progress.total)}`}
           </Typography>
           <Typography variant="caption" sx={{ fontSize: 10, minWidth: 56 }}>
             {progress.speed}

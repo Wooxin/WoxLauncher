@@ -10,9 +10,18 @@ export interface InstanceConfig {
   gameArgs: string[];
   resolutionWidth: number;
   resolutionHeight: number;
+  fullscreen: boolean;
+  useInstanceSettings: boolean;
   createdAt: string;
   lastPlayedAt: string | null;
   downloaded: boolean;
+}
+
+export interface ImportedModpack {
+  instance: InstanceConfig;
+  format: string;
+  installedFiles: number;
+  downloadedFiles: number;
 }
 
 export type LoaderType = "vanilla" | "fabric" | "forge" | "quilt" | "neoforge" | "liteloader" | "rift" | "optifine";
@@ -67,6 +76,7 @@ export interface StoredAccount {
 
 // Mod
 export type ModSource = "modrinth" | "curseforge" | "mcmod";
+export type ProjectKind = "mod" | "modpack";
 
 export interface ModResult {
   id: string;
@@ -88,4 +98,24 @@ export interface ModDetail extends ModResult {
   fileSize: number;
   license: string;
   updatedAt: string;
+}
+
+export interface LocalModFile {
+  fileName: string;
+  path: string;
+  size: number;
+  modifiedAt: string;
+  enabled: boolean;
+}
+
+export interface ModVersionFile {
+  versionId: string;
+  versionName: string;
+  gameVersions: string[];
+  loaders: string[];
+  datePublished: string;
+  fileName: string;
+  url: string;
+  sha1?: string;
+  size: number;
 }

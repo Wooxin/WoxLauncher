@@ -51,4 +51,3 @@ impl From<rusqlite::Error> for WoxError {
         WoxError::Internal(e.to_string())
     }
 }
-

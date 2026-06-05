@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import type { JavaRuntime } from "../types";
+import { formatError } from "../utils/error";
 
 interface JavaState {
   runtimes: JavaRuntime[];
@@ -20,7 +21,7 @@ export const useJavaStore = create<JavaState>((set) => ({
       const runtimes = await invoke<JavaRuntime[]>("detect_java", { customPath: customPath || null });
       set({ runtimes, loading: false });
     } catch (e) {
-      set({ error: (typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)), loading: false });
+      set({ error: formatError(e), loading: false });
     }
   },
 }));

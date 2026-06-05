@@ -10,7 +10,7 @@ export default function ModBrowser() {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [source, setSource] = useState<ModSource>("modrinth");
-  const { data: results, isLoading } = useModSearch(query, source);
+  const { data: results, isLoading } = useModSearch(query, source, undefined, "mod");
 
   return (
     <Box>

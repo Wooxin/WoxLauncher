@@ -23,10 +23,13 @@
     "loader": "載入器",
     "cancel": "取消",
     "create": "建立",
+    "save": "儲存",
+    "saved": "已儲存",
     "configuration": "設定",
     "launch": "啟動",
     "java": "Java",
     "javaVersion": "版本 {{version}}",
+    "requiredJava": "建議 Java {{version}}",
     "resolution": "解析度",
     "jvmArgs": "JVM 參數",
     "created": "建立時間",
@@ -39,7 +42,12 @@
     "noResults": "找不到 \"{{query}}\" 的相關結果",
     "downloads": "{{count}} 次下載",
     "details": "Mod 詳情",
-    "comingSoon": "即將推出"
+    "comingSoon": "即將推出",
+    "source": "來源",
+    "category": "分類",
+    "downloadUnsupported": "目前只支援從 Modrinth 直接下載",
+    "noDownloadUrl": "{{name}} 沒有可用下載連結",
+    "downloaded": "{{name}} 已加入下載佇列"
   },
   "java": {
     "title": "Java 執行環境",

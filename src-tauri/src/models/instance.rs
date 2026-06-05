@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -27,6 +27,10 @@ pub struct InstanceConfig {
     pub game_args: Vec<String>,
     pub resolution_width: u32,
     pub resolution_height: u32,
+    #[serde(default)]
+    pub fullscreen: bool,
+    #[serde(default)]
+    pub use_instance_settings: bool,
     pub created_at: DateTime<Utc>,
     pub last_played_at: Option<DateTime<Utc>>,
     #[serde(default)]
@@ -46,6 +50,8 @@ impl Default for InstanceConfig {
             game_args: vec![],
             resolution_width: 1920,
             resolution_height: 1080,
+            fullscreen: false,
+            use_instance_settings: false,
             created_at: Utc::now(),
             last_played_at: None,
             downloaded: false,

@@ -17,11 +17,12 @@
         "height": 690,
         "minWidth": 850,
         "minHeight": 550,
-        "center": true
+        "center": true,
+        "dragDropEnabled": true
       }
     ],
     "security": {
-      "csp": "default-src 'self'; connect-src 'self' https://api.modrinth.com https://cdn.modrinth.com https://login.microsoftonline.com https://user.auth.xboxlive.com https://xsts.auth.xboxlive.com https://api.minecraftservices.com; img-src 'self' https://cdn.modrinth.com https: data:; style-src 'self' 'unsafe-inline'"
+      "csp": "default-src 'self'; connect-src 'self' https://api.modrinth.com https://cdn.modrinth.com https://api.curseforge.com https://api.mcmod.cn https://www.curseforge.com https://login.microsoftonline.com https://user.auth.xboxlive.com https://xsts.auth.xboxlive.com https://api.minecraftservices.com; img-src 'self' https://cdn.modrinth.com https: data:; style-src 'self' 'unsafe-inline'"
     }
   },
   "bundle": {

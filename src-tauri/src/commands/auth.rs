@@ -1,8 +1,8 @@
 use crate::app_state::AppState;
 use crate::error::WoxError;
+use crate::services::account_store::{self, StoredAccount};
 use crate::services::auth;
 use crate::services::auth::AuthResult;
-use crate::services::account_store::{self, StoredAccount};
 use chrono::Utc;
 
 fn save_account_from_result(result: &AuthResult, auth_mode: &str, auth_server_url: Option<String>) {
@@ -22,17 +22,17 @@ fn save_account_from_result(result: &AuthResult, auth_mode: &str, auth_server_ur
 
 /// Microsoft OAuth PKCE login — starts local server, opens browser, waits for callback, completes auth
 #[tauri::command]
-pub async fn ms_login(
-    state: tauri::State<'_, AppState>,
-) -> Result<AuthResult, WoxError> {
-    let (listener, auth_url, verifier, redirect_uri) = auth::ms_login_start().await
+pub async fn ms_login(state: tauri::State<'_, AppState>) -> Result<AuthResult, WoxError> {
+    let (listener, auth_url, verifier, redirect_uri) = auth::ms_login_start()
+        .await
         .map_err(|e| WoxError::Auth(e))?;
 
     // Open browser
     let _ = tauri_plugin_opener::open_url(auth_url, None::<&str>);
 
     // Wait for callback + complete auth
-    let result = auth::ms_login_complete(&state.http, listener, &verifier, &redirect_uri).await
+    let result = auth::ms_login_complete(&state.http, listener, &verifier, &redirect_uri)
+        .await
         .map_err(|e| WoxError::Auth(e))?;
 
     save_account_from_result(&result, "msa", None);
@@ -53,7 +53,9 @@ pub async fn authlib_login(
     username: String,
     password: String,
 ) -> Result<AuthResult, WoxError> {
-    let result = auth::authlib_login(&state.http, &server_url, &username, &password).await.map_err(|e| WoxError::Network(e))?;
+    let result = auth::authlib_login(&state.http, &server_url, &username, &password)
+        .await
+        .map_err(|e| WoxError::Network(e))?;
     save_account_from_result(&result, "authlib", Some(server_url.clone()));
     Ok(result)
 }

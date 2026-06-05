@@ -1,6 +1,6 @@
+use crate::error::WoxError;
 use crate::models::java::JavaRuntime;
 use crate::services::java_manager;
-use crate::error::WoxError;
 
 #[tauri::command]
 pub fn detect_java(custom_path: Option<String>) -> Result<Vec<JavaRuntime>, WoxError> {

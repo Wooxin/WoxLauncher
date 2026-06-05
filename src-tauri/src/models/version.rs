@@ -36,6 +36,7 @@ pub struct Library {
     pub downloads: Option<LibraryDownloads>,
     pub rules: Option<Vec<Rule>>,
     pub natives: Option<HashMap<String, String>>,
+    pub url: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]

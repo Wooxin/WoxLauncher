@@ -23,10 +23,13 @@
     "loader": "Загрузчик",
     "cancel": "Отмена",
     "create": "Создать",
+    "save": "Сохранить",
+    "saved": "Сохранено",
     "configuration": "Конфигурация",
     "launch": "Запустить",
     "java": "Java",
     "javaVersion": "Версия {{version}}",
+    "requiredJava": "Recommended Java {{version}}",
     "resolution": "Разрешение",
     "jvmArgs": "Аргументы JVM",
     "created": "Создан",
@@ -39,7 +42,12 @@
     "noResults": "Результаты для \"{{query}}\" не найдены",
     "downloads": "{{count}} загрузок",
     "details": "Детали мода",
-    "comingSoon": "Скоро"
+    "comingSoon": "Скоро",
+    "source": "Источник",
+    "category": "Категория",
+    "downloadUnsupported": "Direct downloads are currently supported for Modrinth only",
+    "noDownloadUrl": "{{name}} has no available download URL",
+    "downloaded": "{{name}} added to downloads"
   },
   "java": {
     "title": "Среды Java",

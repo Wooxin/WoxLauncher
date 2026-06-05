@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+# WoxLauncher runtime data
+woxlauncher/
+wox_data/
+*.sqlite
+*.db
+
+# Tauri build outputs
+src-tauri/target/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

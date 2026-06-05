@@ -1,4 +1,4 @@
-import type { ModResult } from "../types";
+import type { ModResult, ProjectKind } from "../types";
 
 const BASE = "https://api.curseforge.com/v1";
 // CurseForge API key — public key for WoxLauncher
@@ -16,9 +16,10 @@ async function cfFetch(path: string): Promise<any> {
   return resp.json();
 }
 
-export async function searchCurseForge(query: string, version?: string): Promise<ModResult[]> {
+export async function searchCurseForge(query: string, version?: string, kind: ProjectKind = "mod"): Promise<ModResult[]> {
+  const classId = kind === "modpack" ? 4471 : 6;
   const data = await cfFetch(
-    `/mods/search?gameId=432&classId=6&searchFilter=${encodeURIComponent(query)}&pageSize=20&sortField=2&sortOrder=desc` +
+    `/mods/search?gameId=432&classId=${classId}&searchFilter=${encodeURIComponent(query)}&pageSize=20&sortField=2&sortOrder=desc` +
     (version ? `&gameVersion=${version}` : "")
   );
 
@@ -33,6 +34,16 @@ export async function searchCurseForge(query: string, version?: string): Promise
     versions: m.latestFiles?.map((f: any) => f.gameVersions || []).flat() || [],
     author: m.authors?.[0]?.name || "",
   }));
+}
+
+export async function getCurseForgeDownloadUrl(modId: string, version?: string): Promise<{ url: string; filename: string } | null> {
+  const params = new URLSearchParams({ pageSize: "20" });
+  if (version) params.set("gameVersion", version);
+  const data = await cfFetch(`/mods/${modId}/files?${params.toString()}`);
+  const file = data.data?.find((f: any) => f.downloadUrl) || data.data?.[0];
+  if (!file) return null;
+  const url = file.downloadUrl || `https://www.curseforge.com/api/v1/mods/${modId}/files/${file.id}/download-url`;
+  return { url, filename: file.fileName || `${modId}-${file.id}.zip` };
 }
 
 export async function getCurseForgeMod(modId: string): Promise<any> {

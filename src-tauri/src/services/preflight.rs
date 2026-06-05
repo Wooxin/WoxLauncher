@@ -14,19 +14,32 @@ pub async fn ensure_version_json(
     let json_path = version_dir.join(format!("{}.json", game_version));
 
     if json_path.exists() {
-        return Ok(());
+        if std::fs::read_to_string(&json_path)
+            .ok()
+            .and_then(|json| serde_json::from_str::<serde_json::Value>(&json).ok())
+            .is_some()
+        {
+            return Ok(());
+        }
+        let _ = std::fs::remove_file(&json_path);
     }
 
     // Fetch version manifest to find the version-specific URL
     let client = requests::http_client();
     let manifest_url = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
     #[derive(serde::Deserialize)]
-    struct ManifestList { versions: Vec<VersionManifest> }
+    struct ManifestList {
+        versions: Vec<VersionManifest>,
+    }
     let list: ManifestList = client.get(manifest_url).send().await?.json().await?;
 
-    let version_manifest = list.versions.iter()
+    let version_manifest = list
+        .versions
+        .iter()
         .find(|v| v.id == game_version)
-        .ok_or_else(|| WoxError::NotFound(format!("Version {} not found in manifest", game_version)))?;
+        .ok_or_else(|| {
+            WoxError::NotFound(format!("Version {} not found in manifest", game_version))
+        })?;
 
     std::fs::create_dir_all(&version_dir)?;
 
@@ -36,5 +49,6 @@ pub async fn ensure_version_json(
         json_path,
         None,
         format!("Minecraft version {}", game_version),
-    ).await
+    )
+    .await
 }

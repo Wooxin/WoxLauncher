@@ -1,9 +1,10 @@
-pub mod instance;
-pub mod auth;
 pub mod account;
-pub mod launch;
-pub mod java;
-pub mod minecraft;
+pub mod auth;
 pub mod download;
-pub mod java_download;
 pub mod game_installer;
+pub mod instance;
+pub mod java;
+pub mod java_download;
+pub mod launch;
+pub mod minecraft;
+pub mod modpack;

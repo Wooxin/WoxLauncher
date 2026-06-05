@@ -7,16 +7,21 @@ import DownloadIcon from "@mui/icons-material/Download";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import { LOADER_KEYS } from "../../constants";
+import { useJavaStore } from "../../stores/javaStore";
 import type { InstanceConfig } from "../../types";
+import { formatError } from "../../utils/error";
+import { selectRuntimeForGameVersion } from "../../utils/java";
 
 interface Props {
   instance: InstanceConfig;
   onDelete: (id: string) => void;
+  onInstalled?: () => void;
 }
 
-export default function InstanceCard({ instance, onDelete }: Props) {
+export default function InstanceCard({ instance, onDelete, onInstalled }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const runtimes = useJavaStore((s) => s.runtimes);
   const [installing, setInstalling] = useState(false);
 
   return (
@@ -42,9 +47,11 @@ export default function InstanceCard({ instance, onDelete }: Props) {
             e.stopPropagation();
             setInstalling(true);
             try {
-              await invoke("install_game_version", { version: instance.gameVersion });
+              const runtime = selectRuntimeForGameVersion(runtimes, instance.gameVersion, instance.javaVersion);
+              await invoke("install_instance", { instance, javaPath: runtime?.path || instance.javaVersion || "java" });
+              onInstalled?.();
             } catch (e) {
-              alert(typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e));
+              alert(formatError(e));
             } finally {
               setInstalling(false);
             }

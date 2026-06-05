@@ -14,6 +14,8 @@ import { useJavaStore } from "../stores/javaStore";
 import { LOADER_KEYS } from "../constants";
 import AccountPicker from "../components/account/AccountPicker";
 import LoginDialog from "../components/account/LoginDialog";
+import { formatError } from "../utils/error";
+import { selectRuntimeForGameVersion } from "../utils/java";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -42,145 +44,165 @@ export default function Home() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!selectedId && instances.length > 0) {
+      setSelectedId(instances[0].id);
+    }
+  }, [instances, selectedId]);
+
   const selected = instances.find(i => i.id === selectedId) || null;
 
   const handleLaunch = async () => {
     if (!selected) return;
     if (!activeAccount) { setLoginOpen(true); return; }
-    const javaPath = runtimes.length > 0 ? runtimes[0].path : "java";
+    const runtime = selectRuntimeForGameVersion(runtimes, selected.gameVersion, selected.javaVersion);
+    const javaPath = runtime?.path || "java";
     try {
       setLaunchStatus('installing');
-      await invoke("install_game_version", { version: selected.gameVersion });
+      const installed = await invoke<typeof selected>("install_instance", { instance: selected, javaPath });
+      await fetchInstances();
       setLaunchStatus('launching');
-      await invoke("launch_game", { instance: selected, accountUuid: activeAccount.uuid, javaPath });
+      await invoke("launch_game", { instance: installed, accountUuid: activeAccount.uuid, javaPath });
       setLaunchStatus('idle');
       setSnackbar({ open: true, message: t("launch.launched"), severity: "success" });
     } catch (e) {
       setLaunchStatus('idle');
-      setSnackbar({ open: true, message: (typeof e === "object" && e !== null ? ((e as any).message || String(e)) : String(e)), severity: "error" });
+      setSnackbar({ open: true, message: formatError(e), severity: "error" });
     }
   };
 
   if (pageLoading) return <CircularProgress sx={{ display: "block", mx: "auto", mt: 10 }} />;
 
   const isReady = !!(selected && activeAccount && runtimes.length > 0);
+  const selectedRuntime = selected ? selectRuntimeForGameVersion(runtimes, selected.gameVersion, selected.javaVersion) : null;
 
   return (
     <Box>
-      <AccountPicker />
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "65vh", gap: 4, mt: 6 }}>
-        {/* MINECRAFT title */}
-        <Typography
-          variant="h3"
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+        <AccountPicker />
+      </Box>
+
+      <Box
+        sx={{
+          minHeight: "calc(100vh - 150px)",
+          display: "flex",
+          flexDirection: "column",
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "#181818",
+        }}
+      >
+        <Box
           sx={{
-            fontWeight: 800,
-            letterSpacing: 1,
-            color: "primary.main",
-            textShadow: "0 2px 8px rgba(82,165,53,0.3)",
+            flex: 1,
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "1.2fr 0.8fr" },
+            minHeight: 420,
           }}
         >
-          {t("app.title")}
-        </Typography>
+          <Box
+            sx={{
+              p: { xs: 3, md: 5 },
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              borderRight: { xs: 0, md: "1px solid" },
+              borderBottom: { xs: "1px solid", md: 0 },
+              borderColor: "divider",
+              background: "linear-gradient(180deg, #202020 0%, #151515 100%)",
+            }}
+          >
+            <Box>
+              <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800 }}>
+                Minecraft
+              </Typography>
+              <Typography variant="h3" sx={{ fontWeight: 800, mt: 1 }}>
+                Java Edition
+              </Typography>
+              <Typography color="text.secondary" sx={{ mt: 1, maxWidth: 520 }}>
+                {selected ? selected.name : t("instance.noInstances")}
+              </Typography>
+            </Box>
 
+            {selected && (
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mt: 4 }}>
+                <Chip label={selected.gameVersion} size="small" sx={{ bgcolor: "#24351F", color: "primary.light" }} />
+                <Chip label={t(LOADER_KEYS[selected.loaderType] || "common.unknown")} size="small" variant="outlined" />
+                {selectedRuntime && <Chip label={`Java ${selectedRuntime.version}`} size="small" variant="outlined" />}
+                {selected.lastPlayedAt && (
+                  <Chip
+                    label={`${t("instance.lastPlayed")}: ${new Date(selected.lastPlayedAt).toLocaleDateString()}`}
+                    size="small"
+                    variant="outlined"
+                  />
+                )}
+              </Box>
+            )}
+          </Box>
+
+          <Box sx={{ p: { xs: 3, md: 4 }, display: "flex", flexDirection: "column", justifyContent: "center", gap: 2 }}>
         {instances.length === 0 ? (
-          <Box sx={{ textAlign: "center", mt: 2 }}>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+                {t("instance.title")}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
               {t("instance.noInstances")}
             </Typography>
-            <Button variant="contained" size="large" startIcon={<AddIcon />} onClick={() => navigate("/instances")}>
+              <Button variant="contained" size="large" startIcon={<AddIcon />} onClick={() => navigate("/instances")}>
               {t("instance.newInstance")}
             </Button>
           </Box>
         ) : (
           <>
-            {/* Instance selector */}
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <FormControl size="small" sx={{ minWidth: 200 }}>
+                <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 800 }}>
+                  {t("instance.title")}
+                </Typography>
+                <FormControl size="small" fullWidth>
                 <Select
                   value={selectedId}
                   onChange={(e) => setSelectedId(e.target.value)}
-                  sx={{ bgcolor: "background.paper", borderRadius: 1 }}
                 >
                   {instances.map((inst) => (
                     <MenuItem key={inst.id} value={inst.id}>{inst.name}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
-              <Chip
-                label={t("instance.newInstance")}
-                size="small" variant="outlined"
-                onClick={() => navigate("/instances")}
-                sx={{ cursor: "pointer" }}
-              />
-            </Box>
 
-            {/* Version info */}
-            {selected && (
-              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", justifyContent: "center", mt: -2 }}>
-                <Chip label={selected.gameVersion} size="small" sx={{ bgcolor: "rgba(82,165,53,0.15)", color: "primary.main" }} />
-                <Chip label={t(LOADER_KEYS[selected.loaderType] || "common.unknown")} size="small" variant="outlined" />
-                {selected.lastPlayedAt && (
-                  <Typography variant="caption" color="text.secondary" sx={{ alignSelf: "center" }}>
-                    {t("instance.lastPlayed")}: {new Date(selected.lastPlayedAt).toLocaleDateString()}
-                  </Typography>
-                )}
-              </Box>
-            )}
-
-            {/* BIG PLAY BUTTON */}
             <Button
               variant="contained"
               onClick={handleLaunch}
               disabled={!selectedId || launchStatus !== 'idle'}
+                  startIcon={launchStatus === 'idle' ? <PlayArrowIcon /> : <CircularProgress size={18} color="inherit" />}
               sx={{
-                width: 180,
-                height: 180,
-                borderRadius: "50%",
-                fontSize: 18,
+                    height: 56,
+                    mt: 1,
+                    fontSize: 16,
                 fontWeight: 800,
-                letterSpacing: 1,
-                background: isReady
-                  ? "linear-gradient(135deg, #52A535 0%, #3B8526 100%)"
-                  : "linear-gradient(135deg, #555 0%, #333 100%)",
-                boxShadow: isReady
-                  ? "0 8px 32px rgba(82,165,53,0.4), 0 2px 8px rgba(0,0,0,0.3)"
-                  : "0 4px 16px rgba(0,0,0,0.3)",
-                '&:hover': {
-                  transform: 'scale(1.05)',
-                  boxShadow: isReady
-                    ? "0 12px 40px rgba(82,165,53,0.5), 0 4px 12px rgba(0,0,0,0.4)"
-                    : "0 4px 16px rgba(0,0,0,0.3)",
-                },
-                '&:active': { transform: 'scale(0.98)' },
-                transition: 'all 0.2s ease',
-                display: "flex",
-                flexDirection: "column",
-                gap: 0.5,
+                    bgcolor: isReady ? "primary.main" : "#3A3A3A",
+                    "&.Mui-disabled": { bgcolor: "#333", color: "#888" },
               }}
             >
-              {launchStatus !== 'idle' ? (
-                <>
-                  <CircularProgress size={32} sx={{ color: "white" }} />
-                  <Typography variant="caption" sx={{ color: "white", mt: 1 }}>
-                    {launchStatus === 'installing' ? t("download.installingVersion", { version: selected?.gameVersion ?? "" }) : t("launch.starting")}
-                  </Typography>
-                </>
-              ) : (
-                <>
-                  <PlayArrowIcon sx={{ fontSize: 48 }} />
-                  <span>{t("instance.launch")}</span>
-                </>
-              )}
+                  {launchStatus === 'installing'
+                    ? t("download.installingVersion", { version: selected?.gameVersion ?? "" })
+                    : launchStatus === 'launching'
+                      ? t("launch.starting")
+                      : t("instance.launch")}
             </Button>
 
-            {/* Status hint */}
+                <Button variant="outlined" startIcon={<AddIcon />} onClick={() => navigate("/instances")} sx={{ height: 42 }}>
+                  {t("instance.newInstance")}
+                </Button>
+
             {!activeAccount && (
-              <Typography variant="body2" color="warning.main" sx={{ mt: -2 }}>
+                  <Typography variant="body2" color="warning.main">
                 {t("launch.errorAuth")}
               </Typography>
             )}
           </>
         )}
+          </Box>
+        </Box>
       </Box>
       <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
       <Snackbar

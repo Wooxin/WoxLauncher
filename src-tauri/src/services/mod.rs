@@ -1,9 +1,10 @@
-pub mod instance_manager;
-pub mod auth;
 pub mod account_store;
+pub mod auth;
 pub mod downloader;
-pub mod launcher;
-pub mod java_manager;
-pub mod preflight;
-pub mod java_download;
 pub mod game_installer;
+pub mod instance_manager;
+pub mod java_download;
+pub mod java_manager;
+pub mod launcher;
+pub mod modpack_importer;
+pub mod preflight;

@@ -15,7 +15,8 @@ export default function Settings() {
     theme, setTheme, keepOpen, setKeepOpen,
     downloadMirror, setDownloadMirror, maxDownloadThreads, setMaxDownloadThreads,
     defaultJvmArgs, setDefaultJvmArgs, maxMemoryGb, setMaxMemoryGb,
-    autoMemory, setAutoMemory, javaInstallPath, setJavaInstallPath,
+    autoMemory, setAutoMemory, fullscreen, setFullscreen,
+    resolutionWidth, resolutionHeight, setResolution,
   } = useSettingsStore();
 
   return (
@@ -39,15 +40,8 @@ export default function Settings() {
             <ListItem>
               <ListItemText primary={t("settings.downloadPath")} secondary={t("settings.downloadPathValue")} />
             </ListItem>
-            <ListItem disablePadding sx={{ mb: 1 }}>
-              <TextField
-                label={t("settings.javaInstallPath")}
-                value={javaInstallPath}
-                onChange={(e) => setJavaInstallPath(e.target.value)}
-                fullWidth size="small"
-                placeholder={t("settings.javaInstallPathDefault")}
-                helperText={t("settings.javaInstallPathHint")}
-              />
+            <ListItem>
+              <ListItemText primary={t("settings.javaInstallPath")} secondary={t("settings.javaInstallPathDefault")} />
             </ListItem>
           </List>
         </CardContent>
@@ -128,6 +122,10 @@ export default function Settings() {
               <ListItemText primary={t("settings.autoMemory")} secondary={t("settings.autoMemoryDesc")} />
               <Switch checked={autoMemory} onChange={(e) => setAutoMemory(e.target.checked)} />
             </ListItem>
+            <ListItem disablePadding sx={{ mb: 2 }}>
+              <ListItemText primary="全屏显示" secondary="作为所有实例的默认启动显示模式" />
+              <Switch checked={fullscreen} onChange={(e) => setFullscreen(e.target.checked)} />
+            </ListItem>
           </List>
           <TextField
             label={t("settings.defaultJvmArgs")}
@@ -145,7 +143,26 @@ export default function Settings() {
             fullWidth size="small"
             disabled={autoMemory}
             slotProps={{ input: { endAdornment: <InputAdornment position="end">GB</InputAdornment> } }}
+            sx={{ mb: 2 }}
           />
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <TextField
+              label="窗口宽度"
+              type="number"
+              value={resolutionWidth}
+              onChange={(e) => setResolution(Number(e.target.value), resolutionHeight)}
+              fullWidth
+              size="small"
+            />
+            <TextField
+              label="窗口高度"
+              type="number"
+              value={resolutionHeight}
+              onChange={(e) => setResolution(resolutionWidth, Number(e.target.value))}
+              fullWidth
+              size="small"
+            />
+          </Box>
         </CardContent>
       </Card>
 

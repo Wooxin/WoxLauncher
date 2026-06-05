@@ -1,6 +1,6 @@
+use crate::error::WoxError;
 use crate::models::instance::InstanceConfig;
 use crate::services::instance_manager;
-use crate::error::WoxError;
 
 #[tauri::command]
 pub fn list_instances() -> Result<Vec<InstanceConfig>, WoxError> {
